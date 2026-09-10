@@ -1,0 +1,14 @@
+# Debian 13 (trixie) arm64 — Tsinghua mirror (deb822).
+Types: deb
+URIs: https://mirrors.tuna.tsinghua.edu.cn/debian
+Suites: trixie trixie-updates
+Components: main
+Architectures: arm64
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Types: deb
+URIs: https://mirrors.tuna.tsinghua.edu.cn/debian-security
+Suites: trixie-security
+Components: main
+Architectures: arm64
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg

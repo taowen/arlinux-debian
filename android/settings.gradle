@@ -1,0 +1,5 @@
+rootProject.name = 'ardesk-debian'
+def core = new File(System.getenv('ARDESK_DIR') ?: "$settingsDir/../third_party/ardesk").canonicalFile
+gradle.ext.ardeskDir = core
+include ':app', ':desktop'
+project(':desktop').projectDir = new File(core, 'android/app')
