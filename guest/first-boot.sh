@@ -46,3 +46,6 @@ if [ -n "$missing" ]; then
     echo "ARDESK:正在安装 Debian 桌面组件…"
     apt-get install -y --no-install-recommends "$@"
 fi
+
+# Refresh product shortcuts for new installations and APK upgrades.
+"$root/bin/sh" "$root/usr/lib/ardesk/guest/wps-shortcuts.sh"

@@ -59,3 +59,31 @@ bootstrap to xterm, APK update preserving home and package records, apt
 Pre-Depends/cache/purge, runtime identity and nested exec, and Turnip hardware
 GLX plus Wayland EGL teapot presentation and resize. These checks cover this
 recipe; they do not certify every application or future distribution update.
+
+## WPS shortcuts
+
+Run `./wps-writer`, `./wps-spreadsheet`, `./wps-presentation` or `./wps-pdf`
+from the initial terminal. The same names are available on PATH, and four
+`.desktop` entries are installed for application menus. The first launch
+installs dependencies and downloads WPS; later launches use the installed copy.
+Pass a document filename after the command to open it.
+
+The product owns `guest/wps-*.sh`, its download lock (`wps-downloads.tsv`) and
+font aliases. Downloads use the previously tested WPS 11.1.0.11720 ARM64 build
+from the Pi-Apps mirror plus WPS formula fonts, all checked with SHA-256.
+WPS is downloaded on demand and is not bundled in the APK. Existing Office
+settings are preserved. The local-office preset disables the optional cloud
+helper, which is incompatible with this runtime. Failed downloads or installations can be retried by
+running the shortcut again. APK updates refresh shortcuts without replacing
+home or package databases.
+
+Debian installs the vendor packages and legacy codec dependencies with apt.
+
+Launcher checks: `python3 tests/test-wps-launcher.py`.
+
+Validated on Redmi K40 / Android 13 on 2026-09-10: on-device downloads and
+checksums, apt installation with vendor maintainer scripts, all four component
+windows, a local document with spaces in its filename, and APK updates preserving
+package records and the stopped application's Office.conf. The final APK's
+terminal shortcut was also exercised. This covers local startup and document
+opening, not cloud services or every editing feature.
