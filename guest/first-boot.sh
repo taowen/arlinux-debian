@@ -33,7 +33,8 @@ if ! dpkg --configure -a; then
 fi
 set -- xterm fonts-dejavu-core fonts-noto-cjk fontconfig \
     x11-xserver-utils dbus-x11 at-spi2-core \
-    libwayland-egl1 libwayland-client0 libwayland-server0 libx11-xcb1
+    libwayland-egl1 libwayland-client0 libwayland-server0 libx11-xcb1 \
+    libasound2-plugins
 missing=
 for pkg do
     if ! dpkg-query -W -f '${Status}' "$pkg" 2>/dev/null | grep -q 'install ok installed'; then
@@ -47,6 +48,15 @@ if [ -n "$missing" ]; then
     echo "ARDESK:正在安装 Debian 桌面组件…"
     apt-get install -y --no-install-recommends "$@"
 fi
+
+mkdir -p "$root/etc/pulse/client.conf.d" "$root/etc/alsa/conf.d"
+printf 'default-server = unix:%s/runtime/pulse-native\nautospawn = no\nenable-shm = no\n' \
+    "$BIONICX_FILES" > "$root/etc/pulse/client.conf.d/ardesk.conf"
+# Debian's standard ALSA pulse plugin connects to the Android host service.
+cat > "$root/etc/alsa/conf.d/99-ardesk-pulse.conf" <<'ALSA'
+pcm.!default { type pulse }
+ctl.!default { type pulse }
+ALSA
 
 # Refresh product shortcuts for new installations and APK upgrades.
 "$root/bin/sh" "$root/usr/lib/ardesk/guest/wps-shortcuts.sh"

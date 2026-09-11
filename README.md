@@ -53,6 +53,10 @@ The apt test verifies native Pre-Depends ordering, maintainer scripts, package
 marks, cache-only dynamic loading and purge using disposable local packages.
 The multiarch test loads a new library with the cache disabled, checking the
 fallback needed by maintainer scripts before the ldconfig trigger runs.
+Audio playback uses Debian's ALSA pulse plugin and the APK's PulseAudio-to-AAudio
+service. System fragments in `/etc/alsa/conf.d/99-ardesk-pulse.conf` and
+`/etc/pulse/client.conf.d/ardesk.conf` provide defaults; user audio configuration
+is preserved. Android media volume controls the final speaker output.
 Validated on X300 on 2026-09-12: xterm `sudo apt install -y blender`
 installed all 345 packages, including the first shared-mime-info configuration;
 dpkg audit, apt dependency checks and both loader/apt regressions passed.
