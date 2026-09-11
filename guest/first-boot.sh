@@ -21,6 +21,7 @@ printf '/usr/lib/ardesk-platform\n' > "$root/etc/ld.so.conf.d/ardesk.conf"
 # Keep the Android glibc ldconfig across libc-bin upgrades using dpkg's own
 # diversion database. No shell replacement or ignored cache-generation errors.
 dpkg-divert --local --no-rename --add /usr/sbin/ldconfig
+dpkg-divert --local --no-rename --add /usr/bin/sudo
 cp "$root/usr/lib/ardesk-platform/ldconfig" "$root/usr/sbin/ldconfig"
 chmod 755 "$root/usr/sbin/ldconfig"
 ldconfig
