@@ -25,7 +25,7 @@ for rel in usr/bin/apt-get usr/bin/dpkg usr/bin/bash; do
 done
 
 # Helpers must not ship the archived rewriter.
-if [[ -e "$rootfs/usr/lib/ardesk/rootfs-elf-fixup.sh" ]]; then
+if [[ -e "$rootfs/usr/lib/arlinux/rootfs-elf-fixup.sh" ]]; then
     echo "FAIL seed still ships rootfs-elf-fixup.sh" >&2
     fail=1
 fi

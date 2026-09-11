@@ -28,10 +28,10 @@ apt-get -o Acquire::http::Pipeline-Depth=0 \
 cp "$debian_sources" /etc/apt/sources.list.d/debian.sources
 dpkg --audit
 
-mkdir -p /ardesk/metadata
-apt-mark showmanual | sort > /ardesk/metadata/manual-packages.txt
+mkdir -p /arlinux/metadata
+apt-mark showmanual | sort > /arlinux/metadata/manual-packages.txt
 dpkg-query -W -f='${binary:Package}\t${Version}\n' | sort \
-    > /ardesk/metadata/packages.tsv
+    > /arlinux/metadata/packages.tsv
 
 apt-get clean
 rm -rf /var/lib/apt/lists/* /var/log/* /tmp/* /var/tmp/*

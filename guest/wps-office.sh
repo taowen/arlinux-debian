@@ -3,7 +3,7 @@
 set -eu
 export LANG=C.UTF-8 LC_ALL=C.UTF-8
 root=${BIONICX_ROOTFS:?missing BIONICX_ROOTFS}
-guest=$root/usr/lib/ardesk/guest
+guest=$root/usr/lib/arlinux/guest
 app=${1:-writer}
 case "$app" in
     writer) binary=wps ;; spreadsheet) binary=et ;;
@@ -11,7 +11,7 @@ case "$app" in
     *) echo 'Usage: wps-office [writer|spreadsheet|presentation|pdf] [FILE ...]' >&2; exit 2 ;;
 esac
 [ "$#" -eq 0 ] || shift
-cache=$HOME/.cache/ardesk-wps
+cache=$HOME/.cache/arlinux-wps
 mkdir -p "$cache"
 # Serialize installation, including different component shortcuts.
 exec 9>"$cache/install.lock"
@@ -37,7 +37,7 @@ install_wps
 cloud=$root/opt/kingsoft/wps-office/office6/wpscloudsvr
 if [ -x "$cloud" ]; then chmod a-x "$cloud"; fi
 mkdir -p "$root/etc/fonts/conf.d" "$HOME/Documents"
-cp "$guest/50-ardesk-wps-fonts.conf" "$root/etc/fonts/conf.d/50-ardesk-wps-fonts.conf"
+cp "$guest/50-arlinux-wps-fonts.conf" "$root/etc/fonts/conf.d/50-arlinux-wps-fonts.conf"
 flock -u 9
 exec 9>&-
 # Preserve the user's Office.conf; WPS presents its own first-run agreement.

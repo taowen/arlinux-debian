@@ -1,1 +1,1 @@
-apply from: new File(gradle.ext.ardeskDir, 'tools/gradle/product.gradle')
+apply from: new File(gradle.ext.arlinuxDir, 'tools/gradle/product.gradle')

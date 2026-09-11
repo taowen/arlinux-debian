@@ -1,11 +1,11 @@
-# ardesk-debian
+# arlinux-debian
 
-An independent Android Linux desktop application built from Ardesk's shared
+An independent Android Linux desktop application built from Arlinux's shared
 Android library, process runtime and graphics stack.
 
-Application ID: `io.taowen.ardesk.debian`. This APK has its own
+Application ID: `io.taowen.arlinux.debian`. This APK has its own
 Android UID, private rootfs, package database and home directory. It does not
-replace the older `io.taowen.ardesk` application.
+replace the older `io.taowen.arlinux` application.
 
 ## Build
 
@@ -15,16 +15,16 @@ export JAVA_HOME=/path/to/jdk17
 export ANDROID_HOME=/path/to/android-sdk
 export HYBRIS_LIB_DIR=/path/to/libhybris/install/usr/lib/hybris
 # Build the shared native graphics components once:
-third_party/ardesk/tools/build.sh ndk
-third_party/ardesk/tools/build.sh mesa
+third_party/arlinux/tools/build.sh ndk
+third_party/arlinux/tools/build.sh mesa
 ./build.sh
 ```
 
-The output is `build/ardesk-debian-debug.apk`. `--prepare-only` builds userspace
+The output is `build/arlinux-debian-debug.apk`. `--prepare-only` builds userspace
 assets; `--apk-only` assembles existing assets. For development, set
-`ARDESK_DIR=/path/to/ardesk` to use a separate working checkout.
+`ARLINUX_DIR=/path/to/arlinux` to use a separate working checkout.
 Host requirements and the application input contract are described in
-[Ardesk](https://github.com/taowen/ardesk).
+[Arlinux](https://github.com/taowen/arlinux).
 
 `product.json` selects package identity, glibc recipe and library/module paths.
 `tools/seed.sh` produces the distribution rootfs. `guest/first-boot.sh` owns
@@ -42,11 +42,11 @@ The product uses the shared glibc 2.41 recipe. After installing and starting
 its APK, run:
 
 ```sh
-ARDESK_DIR=third_party/ardesk ANDROID_SERIAL=DEVICE tests/test-direct-apt-device.sh
-ARDESK_DIR=third_party/ardesk ANDROID_SERIAL=DEVICE tests/test-multiarch-loader-device.sh
-third_party/ardesk/tests/test-product-device.py --product . --serial DEVICE
-third_party/ardesk/tests/test-teapot-device.py --serial DEVICE \
-  --package io.taowen.ardesk.debian --gpu turnip
+ARLINUX_DIR=third_party/arlinux ANDROID_SERIAL=DEVICE tests/test-direct-apt-device.sh
+ARLINUX_DIR=third_party/arlinux ANDROID_SERIAL=DEVICE tests/test-multiarch-loader-device.sh
+third_party/arlinux/tests/test-product-device.py --product . --serial DEVICE
+third_party/arlinux/tests/test-teapot-device.py --serial DEVICE \
+  --package io.taowen.arlinux.debian --gpu turnip
 ```
 
 The apt test verifies native Pre-Depends ordering, maintainer scripts, package
@@ -54,15 +54,15 @@ marks, cache-only dynamic loading and purge using disposable local packages.
 The multiarch test loads a new library with the cache disabled, checking the
 fallback needed by maintainer scripts before the ldconfig trigger runs.
 Audio playback uses Debian's ALSA pulse plugin and the APK's PulseAudio-to-AAudio
-service. System fragments in `/etc/alsa/conf.d/99-ardesk-pulse.conf` and
-`/etc/pulse/client.conf.d/ardesk.conf` provide defaults; user audio configuration
+service. System fragments in `/etc/alsa/conf.d/99-arlinux-pulse.conf` and
+`/etc/pulse/client.conf.d/arlinux.conf` provide defaults; user audio configuration
 is preserved. Android media volume controls the final speaker output.
 Validated on X300 on 2026-09-12: xterm `sudo apt install -y blender`
 installed all 345 packages, including the first shared-mime-info configuration;
 dpkg audit, apt dependency checks and both loader/apt regressions passed.
 Graphical screenshot checks need unobscured windows; hide the extra-key bar
 with a three-finger swipe down, or start the debug Activity with
-`--ez io.taowen.ardesk.extra.HIDE_EXTRA_KEYS true`.
+`--ez io.taowen.arlinux.extra.HIDE_EXTRA_KEYS true`.
 
 Validated on 2026-09-10 using a Redmi K40 (Android 13, Adreno 650): fresh
 bootstrap to xterm, APK update preserving home and package records, apt

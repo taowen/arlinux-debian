@@ -1,6 +1,6 @@
 {
-  "applicationId": "io.taowen.ardesk.debian",
-  "name": "Ardesk Debian",
+  "applicationId": "io.taowen.arlinux.debian",
+  "name": "Arlinux Debian",
   "versionCode": 1,
   "versionName": "0.1.0",
   "glibcVersion": "2.41",

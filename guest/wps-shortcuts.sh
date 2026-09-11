@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 root=${BIONICX_ROOTFS:?}
-guest=$root/usr/lib/ardesk/guest
+guest=$root/usr/lib/arlinux/guest
 mkdir -p "$HOME" "$HOME/.local/share/applications" "$root/usr/bin"
 # Explicit guest shell also works when refreshed APK assets have /bin/sh shebangs.
 for component in writer spreadsheet presentation pdf; do
@@ -18,7 +18,7 @@ EOF
         presentation) title='WPS 演示'; icon=wps-office-wpp ;;
         pdf) title='WPS PDF'; icon=wps-office-pdf ;;
     esac
-    cat > "$HOME/.local/share/applications/ardesk-wps-$component.desktop" <<EOF
+    cat > "$HOME/.local/share/applications/arlinux-wps-$component.desktop" <<EOF
 [Desktop Entry]
 Type=Application
 Name=$title

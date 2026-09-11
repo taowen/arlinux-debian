@@ -3,9 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
-#define ARDESK_PRODUCT_ENVIRONMENT "DPKG_ROOT", "DPKG_DATADIR",
+#define ARLINUX_PRODUCT_ENVIRONMENT "DPKG_ROOT", "DPKG_DATADIR",
 
-static inline void ardesk_product_environment(void)
+static inline void arlinux_product_environment(void)
 {
     const char *root = bionicx_getenv("BIONICX_ROOTFS");
     const char *exe = bionicx_getenv("BIONICX_EXECFN");

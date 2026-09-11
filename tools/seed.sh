@@ -4,8 +4,8 @@ product="$(cd "$(dirname "$0")/.." && pwd)"
 out="${1:?rootfs output required}"
 base_image="docker.io/library/debian@sha256:c94f5ddd41327aa2d4a7cfba7889056c02936182fd76a513fec6160c97181fc0"
 input_id="$(sha256sum "$product/tools/install-seed.sh" "$product/guest/debian.sources" | sha256sum | cut -c1-20)"
-image="localhost/ardesk-debian-seed:$input_id"
-container="ardesk-debian-seed-$$"
+image="localhost/arlinux-debian-seed:$input_id"
+container="arlinux-debian-seed-$$"
 trap 'podman rm -f "$container" >/dev/null 2>&1 || true' EXIT
 if ! podman image exists "$image"; then
     podman create --name "$container" --arch arm64 --network host \

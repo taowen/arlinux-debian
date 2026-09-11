@@ -1,4 +1,4 @@
-Ardesk Debian 桌面
+Arlinux Debian 桌面
 
 在终端用 Debian 自带的 apt 安装软件，再直接运行：
 
