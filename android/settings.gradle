@@ -1,5 +1,21 @@
-rootProject.name = 'ardesk-debian'
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://www.jitpack.io' }
+    }
+}
 def core = new File(System.getenv('ARDESK_DIR') ?: "$settingsDir/../third_party/ardesk").canonicalFile
 gradle.ext.ardeskDir = core
+rootProject.name = 'ardesk-debian'
 include ':app', ':desktop'
 project(':desktop').projectDir = new File(core, 'android/app')
+apply from: new File(core, 'tools/gradle/hosted-modules.settings.gradle')
