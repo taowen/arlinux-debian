@@ -43,6 +43,7 @@ its APK, run:
 
 ```sh
 ARDESK_DIR=third_party/ardesk ANDROID_SERIAL=DEVICE tests/test-direct-apt-device.sh
+ARDESK_DIR=third_party/ardesk ANDROID_SERIAL=DEVICE tests/test-multiarch-loader-device.sh
 third_party/ardesk/tests/test-product-device.py --product . --serial DEVICE
 third_party/ardesk/tests/test-teapot-device.py --serial DEVICE \
   --package io.taowen.ardesk.debian --gpu turnip
@@ -50,6 +51,11 @@ third_party/ardesk/tests/test-teapot-device.py --serial DEVICE \
 
 The apt test verifies native Pre-Depends ordering, maintainer scripts, package
 marks, cache-only dynamic loading and purge using disposable local packages.
+The multiarch test loads a new library with the cache disabled, checking the
+fallback needed by maintainer scripts before the ldconfig trigger runs.
+Validated on X300 on 2026-09-12: xterm `sudo apt install -y blender`
+installed all 345 packages, including the first shared-mime-info configuration;
+dpkg audit, apt dependency checks and both loader/apt regressions passed.
 Graphical screenshot checks need unobscured windows; hide the extra-key bar
 with a three-finger swipe down, or start the debug Activity with
 `--ez io.taowen.ardesk.extra.HIDE_EXTRA_KEYS true`.
