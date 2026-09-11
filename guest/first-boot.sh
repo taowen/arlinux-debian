@@ -4,6 +4,8 @@ set -eu
 root=${BIONICX_ROOTFS:?missing BIONICX_ROOTFS}
 export DPKG_ROOT=$root BIONICX_VIRTUAL_ROOT=1
 export DEBIAN_FRONTEND=noninteractive
+# Multiarch lives in ld.so.conf; postinsts run before the ldconfig trigger.
+export LD_LIBRARY_PATH="$root/usr/lib/aarch64-linux-gnu:$root/lib/aarch64-linux-gnu:$root/usr/lib/ardesk-platform${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export DEBCONF_NONINTERACTIVE_SEEN=true
 
 guest=$root/usr/lib/ardesk/guest
