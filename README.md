@@ -11,7 +11,7 @@ replace the older `io.taowen.arlinux` application.
 
 ```sh
 git submodule update --init --recursive
-export JAVA_HOME=/path/to/jdk17
+export JAVA_HOME=/path/to/jdk21
 export ANDROID_HOME=/path/to/android-sdk
 export HYBRIS_LIB_DIR=/path/to/libhybris/install/usr/lib/hybris
 # Build the shared native graphics components once:
