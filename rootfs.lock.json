@@ -1,0 +1,6 @@
+{
+  "suite": "trixie",
+  "mirror": "https://mirrors.tuna.tsinghua.edu.cn/debian",
+  "variant": "minbase",
+  "include": "apt,binutils,ca-certificates,coreutils,curl,dash,debian-archive-keyring,dpkg,findutils,grep,patchelf,sed,systemd-standalone-sysusers"
+}
