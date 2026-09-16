@@ -1,2 +1,7 @@
 *.sh text eol=lf
 android/gradlew text eol=lf
+guest/*.conf text eol=lf
+guest/*.in text eol=lf
+guest/*.sources text eol=lf
+guest/*.tsv text eol=lf
+tests/*.py text eol=lf

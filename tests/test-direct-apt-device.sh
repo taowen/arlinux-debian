@@ -81,11 +81,19 @@ chmod 755 "$out/lib/DEBIAN/postinst" "$out/lib/DEBIAN/postrm" \
         -o lib/usr/lib/arlinux-apt-test/libarlinux-apt-test.so.1.0
     aarch64-linux-gnu-gcc client.c -Llib/usr/lib/arlinux-apt-test \
         -l:libarlinux-apt-test.so.1.0 -o client/usr/lib/arlinux-apt-test/cache-client
-    dpkg-deb --root-owner-group --build lib lib.deb
-    dpkg-deb --root-owner-group --build client client.deb
+    # DrvFS reports directories as 0777 unless WSL metadata is enabled.
+    # These are disposable fixtures, so skip only dpkg-deb's host-side mode
+    # check and keep the package/runtime assertions below unchanged.
+    dpkg-deb --root-owner-group --nocheck --build lib lib.deb
+    dpkg-deb --root-owner-group --nocheck --build client client.deb
 )
 for deb in lib client; do
-    "${adb[@]}" push "$out/$deb.deb" "/data/local/tmp/arlinux-apt-$deb.deb"
+    local_deb="$out/$deb.deb"
+    # Windows platform-tools invoked through WSL need a Windows source path.
+    if [[ "$adb_bin" == *.exe ]] && command -v wslpath >/dev/null 2>&1; then
+        local_deb="$(wslpath -w "$local_deb")"
+    fi
+    "${adb[@]}" push "$local_deb" "/data/local/tmp/arlinux-apt-$deb.deb"
     "${adb[@]}" shell run-as "$package" cp "/data/local/tmp/arlinux-apt-$deb.deb" "files/$deb.deb"
 done
 "$core/tools/guest-desk.sh" exec "$root/bin/sh" -s <<'SH'
