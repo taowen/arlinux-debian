@@ -2,7 +2,7 @@
 # A newly unpacked library must load without an ldconfig cache entry.
 set -euo pipefail
 repo=$(cd "$(dirname "$0")/.." && pwd)
-core=${ARLINUX_DIR:-$repo/third_party/arlinux}
+core=${ARLINUX_DIR:-$(cd "$repo/../.." && pwd)}
 : "${ANDROID_SERIAL:?select an Arlinux Debian device}"
 package=io.taowen.arlinux.debian
 root=/data/user/0/$package/files/rootfs

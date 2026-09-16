@@ -10,17 +10,18 @@ replace the older `io.taowen.arlinux` application.
 ## Build
 
 ```sh
-git submodule update --init --recursive
+git -C /path/to/arlinux submodule update --init --recursive
+cd /path/to/arlinux
 export JAVA_HOME=/path/to/jdk21
 export ANDROID_HOME=/path/to/android-sdk
 export HYBRIS_LIB_DIR=/path/to/libhybris/install/usr/lib/hybris
 # Build the shared native graphics components once:
-third_party/arlinux/tools/build.sh ndk
-third_party/arlinux/tools/build.sh mesa
-./build.sh
+tools/build.sh ndk
+tools/build.sh mesa
+distributions/debian/build.sh
 ```
 
-The output is `build/arlinux-debian-debug.apk`. `--prepare-only` builds userspace
+The output is `distributions/debian/build/arlinux-debian-debug.apk`. `--prepare-only` builds userspace
 assets; `--apk-only` assembles existing assets. For development, set
 `ARLINUX_DIR=/path/to/arlinux` to use a separate working checkout.
 Host requirements and the application input contract are described in
@@ -33,8 +34,9 @@ is compiled into this product's copy of the common runtime; it is not loaded
 as a runtime plugin. Android Activity, input, JNI, sessions, GPU selection,
 asset installation and build orchestration are shared without copied Java.
 
-The shared checkout is pinned as a Git submodule. Do not commit generated
-rootfs archives, APKs or package caches into this source repository.
+This repository is pinned by the parent Arlinux checkout under
+`distributions/debian`; it does not embed another copy of Arlinux. Do not commit
+generated rootfs archives, APKs or package caches into this source repository.
 
 ## Checks
 
@@ -42,10 +44,10 @@ The product uses the shared glibc 2.41 recipe. After installing and starting
 its APK, run:
 
 ```sh
-ARLINUX_DIR=third_party/arlinux ANDROID_SERIAL=DEVICE tests/test-direct-apt-device.sh
-ARLINUX_DIR=third_party/arlinux ANDROID_SERIAL=DEVICE tests/test-multiarch-loader-device.sh
-third_party/arlinux/tests/test-product-device.py --product . --serial DEVICE
-third_party/arlinux/tests/test-teapot-device.py --serial DEVICE \
+ANDROID_SERIAL=DEVICE distributions/debian/tests/test-direct-apt-device.sh
+ANDROID_SERIAL=DEVICE distributions/debian/tests/test-multiarch-loader-device.sh
+tests/test-product-device.py --product distributions/debian --serial DEVICE
+tests/test-teapot-device.py --serial DEVICE \
   --package io.taowen.arlinux.debian --gpu turnip
 ```
 
