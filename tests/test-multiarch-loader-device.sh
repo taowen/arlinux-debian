@@ -20,13 +20,12 @@ int main(void) {
     return value != 42;
 }
 C
-builder=$("$core/tools/ensure-glibc-builder.sh")
-podman run --rm --userns=keep-id --volume "$out:/work:z" --workdir /work \
-    "$builder" sh -eu -c '
+(
+    cd "$out"
     aarch64-linux-gnu-gcc -shared -fPIC lib.c \
         -Wl,-soname,libarlinux-uncached-test.so.1 -o libarlinux-uncached-test.so.1
     aarch64-linux-gnu-gcc client.c -L. -l:libarlinux-uncached-test.so.1 -o client
-    '
+)
 adb=("${ADB:-adb}" -s "$ANDROID_SERIAL")
 cleanup() {
     "${adb[@]}" shell run-as "$package" rm -f \

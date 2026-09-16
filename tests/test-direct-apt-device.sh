@@ -75,16 +75,15 @@ set -eu
 SH
 chmod 755 "$out/lib/DEBIAN/postinst" "$out/lib/DEBIAN/postrm" \
     "$out/client/DEBIAN/preinst" "$out/client/DEBIAN/postinst"
-builder="$("$core/tools/ensure-glibc-builder.sh")"
-podman run --rm --userns=keep-id --volume "$repo_dir:/work:z" \
-    --workdir /work/build/direct-apt-test "$builder" sh -eu -c '
+(
+    cd "$out"
     aarch64-linux-gnu-gcc -shared -fPIC library.c -Wl,-soname,libarlinux-apt-test.so.1 \
         -o lib/usr/lib/arlinux-apt-test/libarlinux-apt-test.so.1.0
     aarch64-linux-gnu-gcc client.c -Llib/usr/lib/arlinux-apt-test \
         -l:libarlinux-apt-test.so.1.0 -o client/usr/lib/arlinux-apt-test/cache-client
     dpkg-deb --root-owner-group --build lib lib.deb
     dpkg-deb --root-owner-group --build client client.deb
-'
+)
 for deb in lib client; do
     "${adb[@]}" push "$out/$deb.deb" "/data/local/tmp/arlinux-apt-$deb.deb"
     "${adb[@]}" shell run-as "$package" cp "/data/local/tmp/arlinux-apt-$deb.deb" "files/$deb.deb"

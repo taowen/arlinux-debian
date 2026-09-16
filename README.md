@@ -7,29 +7,15 @@ Application ID: `io.taowen.arlinux.debian`. This APK has its own
 Android UID, private rootfs, package database and home directory. It does not
 replace the older `io.taowen.arlinux` application.
 
-## Build
+## Development
 
-```sh
-git -C /path/to/arlinux submodule update --init --recursive
-cd /path/to/arlinux
-export JAVA_HOME=/path/to/jdk21
-export ANDROID_HOME=/path/to/android-sdk
-export HYBRIS_LIB_DIR=/path/to/libhybris/install/usr/lib/hybris
-# Build the shared native graphics components once:
-tools/build.sh ndk
-tools/build.sh mesa
-distributions/debian/build.sh
-```
-
-The output is `distributions/debian/build/arlinux-debian-debug.apk`. `--prepare-only` builds userspace
-assets; `--apk-only` assembles existing assets. For development, set
-`ARLINUX_DIR=/path/to/arlinux` to use a separate working checkout.
-Host requirements and the application input contract are described in
-[Arlinux](https://github.com/taowen/arlinux).
+This repository is consumed from `arlinux/distributions/debian`. The former
+Podman product/rootfs build entrypoint has been removed; development now uses
+the parent checkout inside WSL 2.
 
 `product.json` selects package identity, glibc recipe and library/module paths.
-`tools/seed.sh` produces the distribution rootfs. `guest/first-boot.sh` owns
-package-manager configuration and desktop initialization. `native/product-policy.h`
+`guest/first-boot.sh` owns package-manager configuration and desktop
+initialization. `native/product-policy.h`
 is compiled into this product's copy of the common runtime; it is not loaded
 as a runtime plugin. Android Activity, input, JNI, sessions, GPU selection,
 asset installation and build orchestration are shared without copied Java.
