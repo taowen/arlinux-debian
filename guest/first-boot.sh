@@ -34,7 +34,8 @@ fi
 set -- xterm fonts-dejavu-core fonts-noto-cjk fontconfig \
     x11-xserver-utils dbus-x11 at-spi2-core \
     libwayland-egl1 libwayland-client0 libwayland-server0 libx11-xcb1 \
-    libasound2-plugins
+    libasound2-plugins fcitx5 fcitx5-chinese-addons \
+    fcitx5-frontend-gtk3 fcitx5-frontend-qt5
 missing=
 for pkg do
     if ! dpkg-query -W -f '${Status}' "$pkg" 2>/dev/null | grep -q 'install ok installed'; then

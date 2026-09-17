@@ -24,6 +24,11 @@ This repository is pinned by the parent Arlinux checkout under
 `distributions/debian`; it does not embed another copy of Arlinux. Do not commit
 generated rootfs archives, APKs or package caches into this source repository.
 
+The desktop session starts Fcitx5 with English and Pinyin enabled. Swipe inward
+from the Android window's right side to show or hide the Linux touch keyboard,
+then tap its `中 / En` control to switch input languages. Candidate windows are
+rendered by anlabwc inside the desktop.
+
 ## Checks
 
 The product uses the shared glibc 2.41 recipe. After installing and starting
