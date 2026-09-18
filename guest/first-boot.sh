@@ -32,7 +32,7 @@ if ! dpkg --configure -a; then
     apt-get -f install -y
 fi
 set -- xterm fonts-dejavu-core fonts-noto-cjk fontconfig \
-    x11-xserver-utils dbus-x11 at-spi2-core \
+    x11-xserver-utils x11-utils dbus-x11 at-spi2-core python3-dbus python3-pyatspi \
     libwayland-egl1 libwayland-client0 libwayland-server0 libx11-xcb1 \
     libasound2-plugins fcitx5 fcitx5-chinese-addons \
     fcitx5-frontend-gtk3 fcitx5-frontend-qt5
