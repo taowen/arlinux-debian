@@ -7,11 +7,13 @@ guest=$root/usr/lib/arlinux/guest
 config=$home/.config/opencode
 agents=$config/AGENTS.md
 user_config=$config/opencode.json
+plugin_dir=$config/plugin
+environment_plugin=$plugin_dir/arlinux-environment.js
 temporary=$config/.AGENTS.md.arlinux-new
 begin='<!-- BEGIN ARLINUX MANAGED INSTRUCTIONS -->'
 end='<!-- END ARLINUX MANAGED INSTRUCTIONS -->'
 
-mkdir -p "$config" "$root/usr/local/bin"
+mkdir -p "$config" "$plugin_dir" "$root/usr/local/bin"
 if [ -f "$agents" ]; then
     awk -v begin="$begin" -v end="$end" '
         $0 == begin { managed = 1; next }
@@ -44,5 +46,11 @@ if [ ! -e "$user_config" ]; then
 EOF
 fi
 chmod 600 "$user_config"
+
+# OpenCode's Electron host sets NO_AT_BRIDGE for Chromium itself. Use the
+# supported shell.env hook so that commands run by the shell tool do not pass
+# that Chromium-private setting to GTK applications.
+cp "$guest/opencode-arlinux-environment.js" "$environment_plugin"
+chmod 600 "$environment_plugin"
 
 ln -sfn ../../lib/arlinux/guest/arlinux-a11y "$root/usr/local/bin/arlinux-a11y"

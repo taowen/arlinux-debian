@@ -28,6 +28,9 @@ with tempfile.TemporaryDirectory() as directory:
     assert "Keep my note" in first
     assert "arlinux-a11y dump" in first
     assert (root / "usr/local/bin/arlinux-a11y").is_symlink()
+    plugin = config / "plugin/arlinux-environment.js"
+    assert plugin.read_text() == (guest / "opencode-arlinux-environment.js").read_text()
+    assert 'output.env.NO_AT_BRIDGE = "0"' in plugin.read_text()
     merged = json.loads(user_config.read_text())
     assert merged["permission"]["external_directory"] == "allow"
     assert not (config / "arlinux.json").exists()
@@ -41,5 +44,6 @@ with tempfile.TemporaryDirectory() as directory:
     assert "Updated Arlinux instructions" in second
     assert "arlinux-a11y dump" not in second
     assert json.loads(user_config.read_text()) == {"model": "example/custom"}
+    assert plugin.read_text() == (guest / "opencode-arlinux-environment.js").read_text()
 
 print("PASS: OpenCode global instructions update without replacing user rules")
