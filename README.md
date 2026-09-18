@@ -29,6 +29,13 @@ from the Android window's right side to show or hide the Linux touch keyboard,
 then tap its `中 / En` control to switch input languages. Candidate windows are
 rendered by anlabwc inside the desktop.
 
+First boot downloads the pinned official OpenCode Desktop ARM64 package, checks
+its SHA-256 digest, installs its Debian dependencies and starts its GUI as the
+default desktop application. OpenCode provider login remains an explicit user
+action; connect OpenCode Zen from the GUI to use the currently available free
+models. Xterm remains installed for command-line recovery and for shortcuts
+that need a terminal, but it is no longer the default desktop application.
+
 ## Checks
 
 The product uses the shared glibc 2.41 recipe. After installing and starting

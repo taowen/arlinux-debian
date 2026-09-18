@@ -31,7 +31,7 @@ if ! dpkg --configure -a; then
     apt-get update
     apt-get -f install -y
 fi
-set -- xterm fonts-dejavu-core fonts-noto-cjk fontconfig \
+set -- xterm curl ca-certificates fonts-dejavu-core fonts-noto-cjk fontconfig \
     x11-xserver-utils x11-utils dbus-x11 at-spi2-core python3-dbus python3-pyatspi \
     libwayland-egl1 libwayland-client0 libwayland-server0 libx11-xcb1 \
     libasound2-plugins fcitx5 fcitx5-chinese-addons \
@@ -49,6 +49,9 @@ if [ -n "$missing" ]; then
     echo "ARLINUX:正在安装 Debian 桌面组件…"
     apt-get install -y --no-install-recommends "$@"
 fi
+
+"$root/bin/sh" "$guest/opencode-install.sh"
+"$root/bin/sh" "$guest/opencode-instructions.sh"
 
 mkdir -p "$root/etc/pulse/client.conf.d" "$root/etc/alsa/conf.d"
 printf 'default-server = unix:%s/runtime/pulse-native\nautospawn = no\nenable-shm = no\n' \
