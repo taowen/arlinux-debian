@@ -53,4 +53,6 @@ chmod 600 "$user_config"
 cp "$guest/opencode-arlinux-environment.js" "$environment_plugin"
 chmod 600 "$environment_plugin"
 
-ln -sfn ../../lib/arlinux/guest/arlinux-a11y "$root/usr/local/bin/arlinux-a11y"
+# Older images exposed a product-specific accessibility command here.  Keep
+# OpenCode on the standard dogtail/pyatspi APIs it already knows instead.
+rm -f "$root/usr/local/bin/arlinux-a11y"

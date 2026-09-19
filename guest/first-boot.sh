@@ -17,6 +17,9 @@ printf 'force-not-root\nforce-script-chrootless\nroot=%s\nadmindir=%s/var/lib/dp
     > "$root/etc/dpkg/dpkg.cfg.d/arlinux"
 mkdir -p "$root/etc/ld.so.conf.d"
 printf '/usr/lib/arlinux-platform\n' > "$root/etc/ld.so.conf.d/arlinux.conf"
+mkdir -p "$root/etc/fonts/conf.d"
+cp "$guest/50-arlinux-wps-fonts.conf" \
+    "$root/etc/fonts/conf.d/50-arlinux-wps-fonts.conf"
 
 # Keep the Android glibc ldconfig across libc-bin upgrades using dpkg's own
 # diversion database. No shell replacement or ignored cache-generation errors.
@@ -33,6 +36,8 @@ if ! dpkg --configure -a; then
 fi
 set -- xterm curl ca-certificates fonts-dejavu-core fonts-noto-cjk fontconfig \
     x11-xserver-utils x11-utils dbus-x11 at-spi2-core python3-dbus python3-pyatspi \
+    python3-dogtail python3-pip mpg123 \
+    wl-clipboard wtype xclip xdotool \
     libwayland-egl1 libwayland-client0 libwayland-server0 libx11-xcb1 \
     libasound2-plugins fcitx5 fcitx5-chinese-addons \
     fcitx5-frontend-gtk3 fcitx5-frontend-qt5
@@ -49,6 +54,19 @@ if [ -n "$missing" ]; then
     echo "ARLINUX:正在安装 Debian 桌面组件…"
     apt-get install -y --no-install-recommends "$@"
 fi
+
+# edge-tts uses Microsoft's online Edge speech service.  Pin the Python client
+# so initial installations remain reproducible; mpg123 plays through PulseAudio
+# without launching a media-player window.
+if ! python3 -c 'import edge_tts' >/dev/null 2>&1; then
+    echo "ARLINUX:正在安装在线语音进度播报组件…"
+    python3 -m pip install --break-system-packages --no-cache-dir 'edge-tts==7.2.8'
+fi
+mkdir -p "$root/usr/lib/python3/dist-packages"
+mkdir -p "$root/usr/lib/python3/dist-packages/arlinux"
+rm -f "$root/usr/lib/python3/dist-packages/arlinux/_accessibility.py"
+cp "$guest/arlinux/"*.py "$root/usr/lib/python3/dist-packages/arlinux/"
+rm -f "$root/usr/lib/python3/dist-packages/arlinux_tts.py"
 
 "$root/bin/sh" "$guest/opencode-install.sh"
 "$root/bin/sh" "$guest/opencode-instructions.sh"

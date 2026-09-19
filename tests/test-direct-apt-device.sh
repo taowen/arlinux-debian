@@ -96,7 +96,8 @@ for deb in lib client; do
     "${adb[@]}" push "$local_deb" "/data/local/tmp/arlinux-apt-$deb.deb"
     "${adb[@]}" shell run-as "$package" cp "/data/local/tmp/arlinux-apt-$deb.deb" "files/$deb.deb"
 done
-"$core/tools/guest-desk.sh" exec "$root/bin/sh" -s <<'SH'
+python3 "$core/tools/product-device.py" --serial "$ANDROID_SERIAL" \
+    --product "$repo_dir" exec /bin/sh -s <<'SH'
 set -eu
 root=$BIONICX_ROOTFS
 files=$BIONICX_FILES
@@ -116,7 +117,8 @@ SH
 "${adb[@]}" shell run-as "$package" /system/bin/env LD_PRELOAD= LD_LIBRARY_PATH= \
     "$root/usr/lib/arlinux-platform/ld-linux-aarch64.so.1" \
     --library-path "$root/usr/lib/arlinux-platform" "$root/usr/lib/arlinux-apt-test/cache-client"
-"$core/tools/guest-desk.sh" exec "$root/bin/sh" -s <<'SH'
+python3 "$core/tools/product-device.py" --serial "$ANDROID_SERIAL" \
+    --product "$repo_dir" exec /bin/sh -s <<'SH'
 set -eu
 root=$BIONICX_ROOTFS
 files=$BIONICX_FILES

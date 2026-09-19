@@ -21,12 +21,25 @@ fetch() {
     [ -n "$row" ] || { echo "Missing download: $1" >&2; exit 1; }
     version=$(printf '%s\n' "$row" | cut -f2)
     checksum=$(printf '%s\n' "$row" | cut -f3)
-    url=$(printf '%s\n' "$row" | cut -f4)
     download=$cache/$1-$version.deb
     if ! printf '%s  %s\n' "$checksum" "$download" | sha256sum -c - >/dev/null 2>&1; then
-        echo "下载 $1 ($version)…" >&2
-        curl --fail --location --retry 3 --connect-timeout 30 -o "$download.partial" "$url"
-        printf '%s  %s\n' "$checksum" "$download.partial" | sha256sum -c - >&2
+        rm -f "$download.partial"
+        fetched=
+        for url in $(printf '%s\n' "$row" | cut -f4- | tr '\t' '\n'); do
+            echo "下载 $1 ($version)…" >&2
+            if curl --fail --location --retry 3 --retry-all-errors \
+                    --connect-timeout 30 -o "$download.partial" "$url" &&
+                    printf '%s  %s\n' "$checksum" "$download.partial" | sha256sum -c - >&2; then
+                fetched=1
+                break
+            fi
+            rm -f "$download.partial"
+            echo "下载源不可用，尝试备用地址…" >&2
+        done
+        [ -n "$fetched" ] || {
+            echo "无法下载或校验 $1 ($version)" >&2
+            return 1
+        }
         mv "$download.partial" "$download"
     fi
 }
@@ -36,8 +49,7 @@ install_wps
 # under this runtime. Leave document editors and local file handling enabled.
 cloud=$root/opt/kingsoft/wps-office/office6/wpscloudsvr
 if [ -x "$cloud" ]; then chmod a-x "$cloud"; fi
-mkdir -p "$root/etc/fonts/conf.d" "$HOME/Documents"
-cp "$guest/50-arlinux-wps-fonts.conf" "$root/etc/fonts/conf.d/50-arlinux-wps-fonts.conf"
+mkdir -p "$HOME/Documents"
 flock -u 9
 exec 9>&-
 # Preserve the user's Office.conf; WPS presents its own first-run agreement.

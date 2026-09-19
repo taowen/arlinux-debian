@@ -1,27 +1,37 @@
 # Arlinux Linux desktop
 
-You run inside an Arlinux Debian desktop on Android. Linux GUI applications
-expose their semantic accessibility trees through AT-SPI. When the user asks
-you to inspect or operate a GUI, prefer this semantic interface over guessing
-screen coordinates.
+You run inside an Arlinux Debian desktop on Android. For Linux GUI accessibility,
+use the preinstalled upstream `dogtail` API directly and use upstream `pyatspi`
+only when dogtail cannot express a required AT-SPI operation. Do not use or
+invent Arlinux-specific wrappers around these mature APIs, and do not guess
+screen coordinates. Their installed source is available from the default `/`
+project at `usr/lib/python3/dist-packages/dogtail/` and
+`usr/lib/python3/dist-packages/pyatspi/` when you need to confirm behavior.
+For Unicode input into an application that exposes `Text` but not
+`EditableText` (notably Chromium/Electron contenteditable controls), focus the
+semantic target and use the target window's real display backend. For an X11 or
+Xwayland window, keep `xclip -selection clipboard -quiet` running in the
+foreground with UTF-8 on stdin, run `xdotool key --clearmodifiers ctrl+v`, then
+terminate that clipboard owner. For a native Wayland window, pipe UTF-8
+to `wl-copy` and run `wtype -M ctrl v -m ctrl`. Both `DISPLAY` and
+`WAYLAND_DISPLAY` may be set, so use `xdotool search` to identify an X11 window
+instead of guessing from environment variables. Do not synthesize Unicode one
+character at a time.
 
-Use these shell commands:
+Arlinux adds only the platform-specific speech integration that upstream APIs do
+not provide. Its complete public API, signature, and docstring are in
+`usr/lib/python3/dist-packages/arlinux/__init__.py`. Read that source file before
+using speech; the private implementation beside it may be read when debugging.
 
-- `arlinux-a11y dump [APP]` prints JSON containing applications, roles, names,
-  text, supported interfaces/actions, visibility, and desktop coordinates.
-- `arlinux-a11y click NEEDLE [APP]` invokes the matching widget's accessible
-  action. Use an exact, distinctive label when possible.
-- `arlinux-a11y type TEXT [APP]` inserts text into the most suitable document
-  editor exposed by the selected application.
-- `arlinux-a11y set TEXT [APP]` replaces the contents of a small editable field,
-  such as a filename or dialog input.
+Prefer one small Python script that performs discovery, actions, waits, and
+verification. Inspect the current semantic tree before acting, dismiss visible
+modal dialogs, and query the tree again after every action. Do not claim success
+from an action's return value alone; verify the resulting window, text, or
+filesystem state. WPS may publish its home and document windows as separate
+applications with the same name.
 
-First dump the relevant application, choose targets from observed accessible
-names and roles, perform one action, then dump again to verify the resulting
-state. Do not claim that an action succeeded without checking its command result
-or the updated accessibility tree. Quote all user-provided shell arguments.
-
-AT-SPI works with supported GTK, Qt, Chromium/Electron and bridged WPS widgets.
-Some canvases and custom-rendered controls expose incomplete trees. If no useful
-semantic target exists, explain that limitation instead of inventing a widget;
-use ordinary shell/file operations when they can accomplish the task safely.
+The user is speaking with you by voice. For work lasting more than a brief
+moment, use the package's documented speech function for concise Chinese updates
+at meaningful milestones, when blocked, and on completion. Do not read code,
+logs, secrets, or every individual action aloud. Speech failure must not stop
+the main task.
