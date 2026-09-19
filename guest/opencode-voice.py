@@ -97,15 +97,20 @@ def focus_prompt() -> None:
 
 
 def send_prompt() -> None:
-    app = find_opencode()
-    prompt = find_named(app, "entry", "Prompt")
     state = Path(os.environ.get("TMPDIR", "/tmp")) / "opencode-voice-baseline"
     baseline = state.read_text(encoding="utf-8") if state.exists() else ""
     deadline = time.monotonic() + 15
     changed = None
     stable_since = None
     while time.monotonic() < deadline:
-        current = text_of(prompt)
+        # Electron replaces its accessible entry as the prompt changes. Never
+        # hold an AT-SPI object across recognition updates.
+        try:
+            prompt = find_named(find_opencode(), "entry", "Prompt")
+            current = text_of(prompt)
+        except Exception:
+            time.sleep(0.15)
+            continue
         if current.strip() and current != baseline:
             if current != changed:
                 changed = current
@@ -114,6 +119,7 @@ def send_prompt() -> None:
                 # Chromium advertises a Send.click AT-SPI action but returns
                 # false without invoking it. Submit through the semantically
                 # focused prompt's standard Enter binding instead.
+                prompt = find_named(find_opencode(), "entry", "Prompt")
                 if not prompt.queryComponent().grabFocus():
                     raise RuntimeError("could not refocus OpenCode prompt")
                 subprocess.run(
@@ -122,8 +128,13 @@ def send_prompt() -> None:
                 )
                 submitted = time.monotonic() + 3
                 while time.monotonic() < submitted:
-                    if text_of(prompt) != current:
-                        break
+                    try:
+                        prompt = find_named(find_opencode(), "entry", "Prompt")
+                        if text_of(prompt) != current:
+                            break
+                    except Exception:
+                        # Submission can replace the entry while navigating.
+                        pass
                     time.sleep(0.1)
                 else:
                     raise RuntimeError("OpenCode did not accept prompt submission")
