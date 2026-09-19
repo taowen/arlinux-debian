@@ -18,6 +18,7 @@ Dir::Bin::planners "usr/lib/apt/planners";
 DPkg::Options {
   "--force-not-root";
   "--force-script-chrootless";
+  "--force-confnew";
   "--root=@ROOT@";
   "--admindir=@ROOT@/var/lib/dpkg";
 };

@@ -13,7 +13,7 @@ if [ ! -f "$root/etc/apt/sources.list.d/debian.sources" ]; then
     cp "$guest/debian.sources" "$root/etc/apt/sources.list.d/debian.sources"
 fi
 sed "s|@ROOT@|$root|g" "$guest/apt.conf.in" > "$root/etc/apt/apt.conf"
-printf 'force-not-root\nforce-script-chrootless\nroot=%s\nadmindir=%s/var/lib/dpkg\n' "$root" "$root" \
+printf 'force-not-root\nforce-script-chrootless\nforce-confnew\nroot=%s\nadmindir=%s/var/lib/dpkg\n' "$root" "$root" \
     > "$root/etc/dpkg/dpkg.cfg.d/arlinux"
 mkdir -p "$root/etc/ld.so.conf.d"
 printf '/usr/lib/arlinux-platform\n' > "$root/etc/ld.so.conf.d/arlinux.conf"
@@ -52,6 +52,10 @@ if [ -n "$missing" ]; then
     apt-get update
     echo "ARLINUX:正在安装 Debian 桌面组件…"
     apt-get install -y --no-install-recommends "$@"
+    # apt may have replaced libc and the loader beneath this still-running
+    # process. Ask Android for a fresh bionicx execution boundary before any
+    # newly installed program is launched.
+    exit 75
 fi
 
 # edge-tts uses Microsoft's online Edge speech service.  Pin the Python client
