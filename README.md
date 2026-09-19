@@ -24,10 +24,9 @@ This repository is pinned by the parent Arlinux checkout under
 `distributions/debian`; it does not embed another copy of Arlinux. Do not commit
 generated rootfs archives, APKs or package caches into this source repository.
 
-The desktop session starts Fcitx5 with English and Pinyin enabled. Swipe inward
-from the Android window's right side to show or hide the Linux touch keyboard,
-then tap its `中 / En` control to switch input languages. Candidate windows are
-rendered by anlabwc inside the desktop.
+The Android right-side handle opens the hosted WeChat Input keyboard on tap and
+starts an AI voice interaction on long press. Linux applications receive its
+text through the host input path; no guest input-method process is required.
 
 First boot downloads the pinned official OpenCode Desktop ARM64 package, checks
 its SHA-256 digest, installs its Debian dependencies and starts its GUI as the

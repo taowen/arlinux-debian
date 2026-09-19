@@ -39,8 +39,7 @@ set -- xterm curl ca-certificates fonts-dejavu-core fonts-noto-cjk fontconfig \
     python3-dogtail python3-pip mpg123 \
     wl-clipboard wtype xclip xdotool \
     libwayland-egl1 libwayland-client0 libwayland-server0 libx11-xcb1 \
-    libasound2-plugins fcitx5 fcitx5-chinese-addons \
-    fcitx5-frontend-gtk3 fcitx5-frontend-qt5
+    libasound2-plugins
 missing=
 for pkg do
     if ! dpkg-query -W -f '${Status}' "$pkg" 2>/dev/null | grep -q 'install ok installed'; then
