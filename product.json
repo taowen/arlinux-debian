@@ -1,8 +1,5 @@
 {
-  "applicationId": "io.taowen.arlinux.debian",
   "name": "Arlinux Debian",
-  "versionCode": 1,
-  "versionName": "0.1.0",
   "glibcVersion": "2.41",
   "libraryDirectories": [
     "usr/lib/aarch64-linux-gnu",

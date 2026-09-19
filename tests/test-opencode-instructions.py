@@ -47,7 +47,7 @@ with tempfile.TemporaryDirectory() as directory:
     assert "help(arlinux)" not in first
     assert "inspect.signature" not in first
     assert "small Python script" in first
-    assert "documented speech function" in first
+    assert "`speak` function" in first
     assert not (root / "usr/local/bin/arlinux-a11y").exists()
     plugin = config / "plugin/arlinux-environment.js"
     assert plugin.read_text() == (guest / "opencode-arlinux-environment.js").read_text()

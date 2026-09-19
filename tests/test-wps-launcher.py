@@ -11,7 +11,7 @@ product = Path(__file__).resolve().parents[1]
 
 
 def shell_path(path):
-    """Use one path spelling throughout an MSYS shell and its child scripts."""
+    """Use one path spelling throughout a POSIX shell and its child scripts."""
     cygpath = shutil.which('cygpath')
     if os.name == 'nt' and cygpath:
         return subprocess.check_output([cygpath, '-u', str(path)], text=True).strip()
