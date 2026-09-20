@@ -47,9 +47,9 @@ with tempfile.TemporaryDirectory() as runtime:
     with mock.patch.object(tts.subprocess, "Popen", Worker), mock.patch.object(
         tts, "_terminate_worker", terminated.append
     ):
-        assert arlinux.speak("第一段") is True
+        assert arlinux.speak("first message") is True
         first_state = json.loads(Path(runtime, "arlinux-tts-state.json").read_text())
-        assert arlinux.speak("第二段") is True
+        assert arlinux.speak("second message") is True
         second_state = json.loads(Path(runtime, "arlinux-tts-state.json").read_text())
 
 assert terminated == [0, first_state["worker_pid"]]

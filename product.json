@@ -1,4 +1,5 @@
 {
+  "$schema": "../../schemas/product.schema.json",
   "name": "Arlinux Debian",
   "glibcVersion": "2.41",
   "libraryDirectories": [

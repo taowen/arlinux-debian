@@ -1,8 +1,12 @@
 # Arlinux Debian
 
-Debian rootfs recipe for [arlinux-rootfs](https://github.com/taowen/arlinux-rootfs).
-It produces an AArch64 Debian bundle; it is not an Android application and has
-no host-specific build entry point.
+Arlinux Debian is the minimal Debian reference distribution for
+[arlinux-rootfs](https://github.com/taowen/arlinux-rootfs). It boots directly
+into OpenCode Desktop and includes standard Debian package management, Linux
+desktop accessibility, online progress speech, and optional WPS launchers.
+
+This repository contains only the Linux distribution recipe. It does not
+contain or require the Android host source.
 
 From an `arlinux-rootfs` checkout:
 
@@ -11,8 +15,22 @@ From an `arlinux-rootfs` checkout:
 ./build.sh verify out/debian.arlinux-rootfs
 ```
 
-`rootfs.lock.json` pins the Debian suite, mirror, debootstrap variant and base
-packages. `tools/seed.sh` creates the root filesystem, `guest/` contains files
-installed into the guest, and `native/product-policy.h` contains the small
-distribution-specific compatibility policy. Shared glibc, GPU and bundle logic
-belongs to `arlinux-rootfs`.
+The build produces `out/debian.arlinux-rootfs`. See the rootfs project's
+[distribution authoring guide](https://github.com/taowen/arlinux-rootfs/blob/main/docs/DISTRIBUTION-AUTHORING.md)
+for the interface implemented here.
+
+## Repository layout
+
+- `rootfs.lock.json` pins the Debian suite and bootstrap inputs.
+- `tools/seed.sh` creates the foreign-architecture rootfs seed.
+- `guest/first-boot.sh` finishes package configuration on the device.
+- `profile.json` launches OpenCode on the host-provided display.
+- `native/product-policy.h` scopes Debian package-manager compatibility.
+- `tests/` covers installer idempotency and generated launchers.
+
+Shared glibc, graphics, bundle, and Android integration code belongs to
+`arlinux-rootfs` or the host, not this repository.
+
+## License
+
+GPL-3.0-or-later. Downloaded applications retain their respective licenses.

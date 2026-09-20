@@ -6,7 +6,7 @@ install_wps() {
         [ "$status" = 'install ok installed' ] || ready=0
     done
     if [ "$ready" -eq 0 ]; then
-        echo '正在安装 WPS 依赖…'
+        echo 'Installing WPS dependencies...'
         export DEBIAN_FRONTEND=noninteractive
         apt-get update
         apt-get install -y --no-install-recommends curl ca-certificates xdg-utils \

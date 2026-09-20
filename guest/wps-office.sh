@@ -26,7 +26,7 @@ fetch() {
         rm -f "$download.partial"
         fetched=
         for url in $(printf '%s\n' "$row" | cut -f4- | tr '\t' '\n'); do
-            echo "下载 $1 ($version)…" >&2
+            echo "Downloading $1 ($version)..." >&2
             if curl --fail --location --retry 3 --retry-all-errors \
                     --connect-timeout 30 -o "$download.partial" "$url" &&
                     printf '%s  %s\n' "$checksum" "$download.partial" | sha256sum -c - >&2; then
@@ -34,10 +34,10 @@ fetch() {
                 break
             fi
             rm -f "$download.partial"
-            echo "下载源不可用，尝试备用地址…" >&2
+            echo "The primary source is unavailable; trying the fallback..." >&2
         done
         [ -n "$fetched" ] || {
-            echo "无法下载或校验 $1 ($version)" >&2
+            echo "Could not download or verify $1 ($version)" >&2
             return 1
         }
         mv "$download.partial" "$download"

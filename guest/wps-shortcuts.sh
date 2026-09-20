@@ -13,16 +13,16 @@ EOF
     chmod 755 "$target"
     ln -sfn "$target" "$HOME/wps-$component"
     case "$component" in
-        writer) title='WPS 文字'; icon=wps-office-wps ;;
-        spreadsheet) title='WPS 表格'; icon=wps-office-et ;;
-        presentation) title='WPS 演示'; icon=wps-office-wpp ;;
+        writer) title='WPS Writer'; icon=wps-office-wps ;;
+        spreadsheet) title='WPS Spreadsheets'; icon=wps-office-et ;;
+        presentation) title='WPS Presentation'; icon=wps-office-wpp ;;
         pdf) title='WPS PDF'; icon=wps-office-pdf ;;
     esac
     cat > "$HOME/.local/share/applications/arlinux-wps-$component.desktop" <<EOF
 [Desktop Entry]
 Type=Application
 Name=$title
-Comment=首次运行下载并安装 WPS，以后直接启动
+Comment=Download and install WPS on first use
 Exec=$root/usr/bin/xterm -u8 -title "$title" -e $target %F
 Icon=$icon
 Terminal=false

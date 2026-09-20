@@ -48,9 +48,9 @@ for pkg do
     fi
 done
 if [ -n "$missing" ]; then
-    echo "ARLINUX:正在更新 Debian 软件源…"
+    echo "ARLINUX:Updating Debian package metadata..."
     apt-get update
-    echo "ARLINUX:正在安装 Debian 桌面组件…"
+    echo "ARLINUX:Installing Debian desktop components..."
     apt-get install -y --no-install-recommends "$@"
     # apt may have replaced libc and the loader beneath this still-running
     # process. Ask Android for a fresh bionicx execution boundary before any
@@ -62,7 +62,7 @@ fi
 # so initial installations remain reproducible; mpg123 plays through PulseAudio
 # without launching a media-player window.
 if ! python3 -c 'import edge_tts' >/dev/null 2>&1; then
-    echo "ARLINUX:正在安装在线语音进度播报组件…"
+    echo "ARLINUX:Installing online speech support..."
     python3 -m pip install --break-system-packages --no-cache-dir 'edge-tts==7.2.8'
 fi
 mkdir -p "$root/usr/lib/python3/dist-packages"
