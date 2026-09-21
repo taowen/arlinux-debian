@@ -36,6 +36,7 @@ if ! dpkg --configure -a; then
 fi
 set -- xterm curl ca-certificates fonts-dejavu-core fonts-noto-cjk fontconfig \
     x11-xserver-utils x11-utils dbus-x11 at-spi2-core python3-dbus python3-pyatspi \
+    ibus ibus-gtk3 ibus-gtk4 gir1.2-ibus-1.0 \
     python3-dogtail python3-pip mpg123 \
     wl-clipboard wtype xclip xdotool \
     libwayland-egl1 libwayland-client0 libwayland-server0 libx11-xcb1 \
