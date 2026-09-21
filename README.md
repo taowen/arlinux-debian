@@ -12,10 +12,10 @@ From an `arlinux-rootfs` checkout:
 
 ```bash
 ./build.sh build debian
-./build.sh verify out/debian.arlinux-rootfs
+./build.sh verify out/debian.zip
 ```
 
-The build produces `out/debian.arlinux-rootfs`. See the rootfs project's
+The build produces `out/debian.zip`. See the rootfs project's
 [distribution authoring guide](https://github.com/taowen/arlinux-rootfs/blob/main/docs/DISTRIBUTION-AUTHORING.md)
 for the interface implemented here.
 
