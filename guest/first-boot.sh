@@ -6,6 +6,10 @@ export DPKG_ROOT=$root BIONICX_VIRTUAL_ROOT=1
 export DEBIAN_FRONTEND=noninteractive
 export DEBCONF_NONINTERACTIVE_SEEN=true
 
+if [ ! -s "$root/etc/machine-id" ]; then
+    tr -d '-' < /proc/sys/kernel/random/uuid > "$root/etc/machine-id"
+fi
+
 guest=$root/usr/lib/arlinux/guest
 mkdir -p "$root/etc/apt/sources.list.d" "$root/etc/dpkg/dpkg.cfg.d" \
     "$root/var/lib/apt/lists/partial" "$root/var/cache/apt/archives/partial" "$root/var/log/apt"
