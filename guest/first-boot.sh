@@ -7,7 +7,9 @@ export DEBIAN_FRONTEND=noninteractive
 export DEBCONF_NONINTERACTIVE_SEEN=true
 
 if [ ! -s "$root/etc/machine-id" ]; then
+    chmod u+w "$root/etc/machine-id"
     tr -d '-' < /proc/sys/kernel/random/uuid > "$root/etc/machine-id"
+    chmod 444 "$root/etc/machine-id"
 fi
 
 guest=$root/usr/lib/arlinux/guest
