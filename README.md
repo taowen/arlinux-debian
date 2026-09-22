@@ -25,7 +25,6 @@ for the interface implemented here.
 - `tools/seed.sh` creates the foreign-architecture rootfs seed.
 - `guest/first-boot.sh` finishes package configuration on the device.
 - `profile.json` launches OpenCode on the host-provided display.
-- `native/product-policy.h` scopes Debian package-manager compatibility.
 - `tests/` covers installer idempotency and generated launchers.
 
 Shared glibc, graphics, bundle, and Android integration code belongs to

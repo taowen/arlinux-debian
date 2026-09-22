@@ -36,15 +36,14 @@ with tempfile.TemporaryDirectory() as directory:
     office = root / 'opt/kingsoft/wps-office/office6'
     office.mkdir(parents=True)
     program = office / 'wps'
-    program.write_text('#!/bin/sh\nprintf "%s\\n" "$@" > "$HOME/arguments"\n')
+    program.write_text('#!/bin/sh\n[ "${TEST_INSTALL_ROOT:-0}" = 0 ] || exit 1\nprintf "%s\\n" "$@" > "$HOME/arguments"\n')
     program.chmod(0o755)
     payload = b'test vendor archive\n'
     sha = hashlib.sha256(payload).hexdigest()
     (guest / 'wps-downloads.tsv').write_text(
-        f'vendor\t1\t{sha}\thttps://primary.invalid/vendor.deb'
-        '\thttps://fallback.invalid/vendor.deb\n'
+        ''.join(f'{name}\t1\t{sha}\thttps://primary.invalid/{name}.deb\thttps://fallback.invalid/{name}.deb\n'
+                for name in ('libwebp6', 'libtiff5', 'wps-office', 'ttf-wps-fonts'))
     )
-    (guest / 'wps-install.sh').write_text('install_wps() { fetch vendor; }\n')
     commands = tmp / 'commands'
     commands.mkdir()
     curl = commands / 'curl'
@@ -64,6 +63,17 @@ if [ "${CORRUPT:-0}" = 1 ]; then printf 'bad archive\\n' > "$output";
 else printf 'test vendor archive\\n' > "$output"; fi
 ''')
     curl.chmod(0o755)
+    sudo = commands / 'sudo'
+    sudo.write_text('#!/bin/sh\nexport TEST_INSTALL_ROOT=1\nexec "$@"\n')
+    sudo.chmod(0o755)
+    for name, source in {
+        'dpkg-query': '[ -f "$HOME/installed" ] && printf "install ok installed"',
+        'apt-get': '[ "$TEST_INSTALL_ROOT" = 1 ] || exit 1\nfor arg do case "$arg" in *.deb) touch "$HOME/installed";; esac; done',
+        'fc-cache': '[ "$TEST_INSTALL_ROOT" = 1 ]',
+    }.items():
+        command = commands / name
+        command.write_text('#!/bin/sh\n' + source + '\n')
+        command.chmod(0o755)
     shell_bin = Path(shutil.which('sh') or '/bin/sh').parent
     env = {**os.environ, 'BIONICX_ROOTFS': shell_path(root), 'HOME': shell_path(home),
            'PATH': shell_path(commands) + ':' + shell_path(shell_bin) + ':' + os.environ['PATH']}
@@ -77,13 +87,11 @@ else printf 'test vendor archive\\n' > "$output"; fi
     assert result.returncode == 0, result.stderr or result.stdout
     assert (home / 'arguments').read_text() == 'a b.docx\n--literal\n'
     assert run().returncode == 0
-    assert (home / 'downloads').read_text().splitlines() == [
-        'https://primary.invalid/vendor.deb', 'https://fallback.invalid/vendor.deb',
-        'https://primary.invalid/vendor.deb', 'https://fallback.invalid/vendor.deb',
-    ]
-    (home / '.cache/arlinux-wps/vendor-1.deb').write_text('corrupted cache')
+    assert len((home / 'downloads').read_text().splitlines()) == 10
+    (home / 'installed').unlink()
+    (home / '.cache/arlinux-wps/libwebp6-1.deb').write_text('corrupted cache')
     assert run().returncode == 0
-    assert len((home / 'downloads').read_text().splitlines()) == 6
+    assert len((home / 'downloads').read_text().splitlines()) == 12
     assert run(['sh', shell_path(guest / 'wps-shortcuts.sh')]).returncode == 0
     result = run(['sh', shell_path(home / 'wps-writer'), 'from shortcut.docx'])
     assert result.returncode == 0, result.stderr or result.stdout

@@ -16,35 +16,7 @@ mkdir -p "$cache"
 # Serialize installation, including different component shortcuts.
 exec 9>"$cache/install.lock"
 flock 9
-fetch() {
-    row=$(awk -F '\t' -v p="$1" '$1 == p { print; exit }' "$guest/wps-downloads.tsv")
-    [ -n "$row" ] || { echo "Missing download: $1" >&2; exit 1; }
-    version=$(printf '%s\n' "$row" | cut -f2)
-    checksum=$(printf '%s\n' "$row" | cut -f3)
-    download=$cache/$1-$version.deb
-    if ! printf '%s  %s\n' "$checksum" "$download" | sha256sum -c - >/dev/null 2>&1; then
-        rm -f "$download.partial"
-        fetched=
-        for url in $(printf '%s\n' "$row" | cut -f4- | tr '\t' '\n'); do
-            echo "Downloading $1 ($version)..." >&2
-            if curl --fail --location --retry 3 --retry-all-errors \
-                    --connect-timeout 30 -o "$download.partial" "$url" &&
-                    printf '%s  %s\n' "$checksum" "$download.partial" | sha256sum -c - >&2; then
-                fetched=1
-                break
-            fi
-            rm -f "$download.partial"
-            echo "The primary source is unavailable; trying the fallback..." >&2
-        done
-        [ -n "$fetched" ] || {
-            echo "Could not download or verify $1 ($version)" >&2
-            return 1
-        }
-        mv "$download.partial" "$download"
-    fi
-}
-. "$guest/wps-install.sh"
-install_wps
+sudo "$root/bin/sh" "$guest/wps-install.sh"
 # Preserve the tested local-office preset: the optional cloud helper crashes
 # under this runtime. Leave document editors and local file handling enabled.
 cloud=$root/opt/kingsoft/wps-office/office6/wpscloudsvr
