@@ -1,6 +1,6 @@
 {
   "$schema": "../../schemas/product.schema.json",
-  "name": "Arlinux Debian",
+  "name": "Debian",
   "glibcVersion": "2.41",
   "libraryDirectories": [
     "usr/lib/aarch64-linux-gnu",
