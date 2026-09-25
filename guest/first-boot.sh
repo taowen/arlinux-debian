@@ -1,10 +1,15 @@
 #!/bin/sh
 # Install desktop packages with standard apt/dpkg. The runtime supplies paths.
 set -eu
-root=${BIONICX_ROOTFS:?missing BIONICX_ROOTFS}
-export DPKG_ROOT=$root BIONICX_VIRTUAL_ROOT=1
+root=/
+unset DPKG_ROOT
 export DEBIAN_FRONTEND=noninteractive
 export DEBCONF_NONINTERACTIVE_SEEN=true
+
+# The foreign seed has not configured base-passwd yet. Use Debian's own
+# account database; libc no longer synthesizes users or groups.
+if [ ! -s /etc/passwd ]; then cp /usr/share/base-passwd/passwd.master /etc/passwd; fi
+if [ ! -s /etc/group ]; then cp /usr/share/base-passwd/group.master /etc/group; fi
 
 if [ ! -s "$root/etc/machine-id" ]; then
     chmod u+w "$root/etc/machine-id"
@@ -19,20 +24,13 @@ if [ ! -f "$root/etc/apt/sources.list.d/debian.sources" ]; then
     cp "$guest/debian.sources" "$root/etc/apt/sources.list.d/debian.sources"
 fi
 sed "s|@ROOT@|$root|g" "$guest/apt.conf.in" > "$root/etc/apt/apt.conf"
-printf 'force-not-root\nforce-script-chrootless\nforce-confnew\nroot=%s\nadmindir=%s/var/lib/dpkg\n' "$root" "$root" \
-    > "$root/etc/dpkg/dpkg.cfg.d/arlinux"
+printf 'force-confnew\n' > "$root/etc/dpkg/dpkg.cfg.d/arlinux"
 mkdir -p "$root/etc/ld.so.conf.d"
-printf '/usr/lib/arlinux-platform\n' > "$root/etc/ld.so.conf.d/arlinux.conf"
 mkdir -p "$root/etc/fonts/conf.d"
 cp "$guest/50-arlinux-wps-fonts.conf" \
     "$root/etc/fonts/conf.d/50-arlinux-wps-fonts.conf"
 
-# Keep the Android glibc ldconfig across libc-bin upgrades using dpkg's own
-# diversion database. No shell replacement or ignored cache-generation errors.
-dpkg-divert --local --no-rename --add /usr/sbin/ldconfig
 dpkg-divert --local --no-rename --add /usr/bin/sudo
-cp "$root/usr/lib/arlinux-platform/ldconfig" "$root/usr/sbin/ldconfig"
-chmod 755 "$root/usr/sbin/ldconfig"
 ldconfig
 
 # dpkg owns interrupted transaction state; no parallel snapshots/manifests.
@@ -60,7 +58,7 @@ if [ -n "$missing" ]; then
     echo "ARLINUX:Installing Debian desktop components..."
     apt-get install -y --no-install-recommends "$@"
     # apt may have replaced libc and the loader beneath this still-running
-    # process. Ask Android for a fresh bionicx execution boundary before any
+    # process. Ask Android for a fresh runtime process before any
     # newly installed program is launched.
     exit 75
 fi
