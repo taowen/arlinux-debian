@@ -98,5 +98,8 @@ else printf 'test vendor archive\\n' > "$output"; fi
     assert (home / 'arguments').read_text() == 'from shortcut.docx\n'
     assert settings.read_text() == 'user settings\n'
     assert len(list((home / '.local/share/applications').glob('arlinux-wps-*.desktop'))) == 4
+    shortcut = (home / '.local/share/applications/arlinux-wps-writer.desktop').read_text()
+    assert '/usr/bin/foot --title="WPS Writer" -- ' in shortcut
+    assert '/usr/bin/xterm' not in shortcut
     assert run(['sh', shell_path(guest / 'wps-office.sh'), 'invalid']).returncode == 2
 print('PASS: checksum failure, retry, cache validation, shortcut and file arguments')

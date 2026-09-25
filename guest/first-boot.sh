@@ -38,7 +38,7 @@ if ! dpkg --configure -a; then
     apt-get update
     apt-get -f install -y
 fi
-set -- xterm curl ca-certificates fonts-dejavu-core fonts-noto-cjk fontconfig \
+set -- foot curl ca-certificates fonts-dejavu-core fonts-noto-cjk fontconfig \
     x11-xserver-utils x11-utils dbus-x11 at-spi2-core python3-dbus python3-pyatspi \
     ibus ibus-gtk3 ibus-gtk4 gir1.2-ibus-1.0 \
     python3-dogtail python3-pip mpg123 \
@@ -61,6 +61,11 @@ if [ -n "$missing" ]; then
     # process. Ask Android for a fresh runtime process before any
     # newly installed program is launched.
     exit 75
+fi
+
+# Prefer the Wayland-native terminal without overriding a user's manual choice.
+if update-alternatives --query x-terminal-emulator | grep -q '^Status: auto$'; then
+    update-alternatives --set x-terminal-emulator /usr/bin/foot
 fi
 
 # edge-tts uses Microsoft's online Edge speech service.  Pin the Python client

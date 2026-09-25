@@ -23,7 +23,7 @@ EOF
 Type=Application
 Name=$title
 Comment=Download and install WPS on first use
-Exec=$root/usr/bin/xterm -u8 -title "$title" -e $target %F
+Exec=$root/usr/bin/foot --title="$title" -- $target %F
 Icon=$icon
 Terminal=false
 Categories=Office;
