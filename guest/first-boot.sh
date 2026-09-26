@@ -18,6 +18,7 @@ if [ ! -s "$root/etc/machine-id" ]; then
 fi
 
 guest=$root/usr/lib/arlinux/guest
+install -Dm755 "$guest/install-codex.sh" "$root/usr/local/bin/arlinux-install-codex"
 mkdir -p "$root/etc/apt/sources.list.d" "$root/etc/dpkg/dpkg.cfg.d" \
     "$root/var/lib/apt/lists/partial" "$root/var/cache/apt/archives/partial" "$root/var/log/apt"
 if [ ! -f "$root/etc/apt/sources.list.d/debian.sources" ]; then
