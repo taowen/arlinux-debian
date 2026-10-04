@@ -2,7 +2,8 @@
 
 Arlinux Debian is the minimal Debian reference distribution for
 [arlinux-rootfs](https://github.com/taowen/arlinux-rootfs). It boots directly
-into OpenCode Desktop and includes standard Debian package management, Linux
+into OpenCode Desktop, including all startup packages for offline first boot,
+and includes standard Debian package management, Linux
 desktop accessibility, online progress speech, and optional WPS launchers.
 It includes the Wayland-native foot terminal. Codex CLI is optional and is
 installed by the user inside the running Debian instance, not bundled in the
@@ -26,12 +27,23 @@ for the interface implemented here.
 
 - `rootfs.lock.json` pins the Debian suite and bootstrap inputs.
 - `tools/seed.sh` creates the foreign-architecture rootfs seed.
-- `guest/first-boot.sh` finishes package configuration on the device.
+- `guest/build-desktop.sh` installs desktop packages, OpenCode and Python dependencies in a disposable Android build instance.
+- `guest/first-boot.sh` writes device-local configuration without network access.
 - `guest/install-codex.sh` installs Codex CLI on the device on request.
 - `profile.json` launches OpenCode on the host-provided display.
 - `tests/` covers installer idempotency and generated launchers.
 
-Shared glibc, graphics, bundle, and Android integration code belongs to
+The normal Linux build creates a foreign seed without QEMU or chroot. Use
+`arlinux-rootfs/tools/device-desktop.py prepare` to create a preparation ZIP,
+install it in a fresh build-only Android instance, then stop and export that
+instance's rootfs. `device-desktop.py seal` turns the snapshot into an offline
+ZIP, removing device-specific state. See the rootfs distribution authoring guide.
+Package installation and mirror downloads run natively on the phone; the Linux
+host only assembles and compresses files. Never export a personal instance.
+Thunar and Mousepad are included for local file and text work. Online AI and
+speech services still require internet; optional applications are not preinstalled.
+
+Shared runtime, graphics, bundle, and Android integration code belongs to
 `arlinux-rootfs` or the host, not this repository.
 
 ## License

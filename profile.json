@@ -13,8 +13,8 @@
     "arguments": [
       "--",
       "${RUNTIME}/usr/lib/arlinux/accessibility-session.sh",
-      "${RUNTIME}/opt/OpenCode/ai.opencode.desktop",
-      "--force-renderer-accessibility"
+      "${RUNTIME}/bin/sh",
+      "${RUNTIME}/usr/lib/arlinux/guest/desktop.sh"
     ],
     "environment": {
       "DISPLAY": "${DISPLAY}",

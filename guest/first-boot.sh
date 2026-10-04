@@ -1,100 +1,22 @@
 #!/bin/sh
-# Install desktop packages with standard apt/dpkg. The runtime supplies paths.
+# Only device-local configuration belongs here. Packages are built into the ZIP.
 set -eu
-root=/
-unset DPKG_ROOT
-export DEBIAN_FRONTEND=noninteractive
-export DEBCONF_NONINTERACTIVE_SEEN=true
-
-# The foreign seed has not configured base-passwd yet. Use Debian's own
-# account database; libc no longer synthesizes users or groups.
-if [ ! -s /etc/passwd ]; then cp /usr/share/base-passwd/passwd.master /etc/passwd; fi
-if [ ! -s /etc/group ]; then cp /usr/share/base-passwd/group.master /etc/group; fi
-
-if [ ! -s "$root/etc/machine-id" ]; then
-    chmod u+w "$root/etc/machine-id"
-    tr -d '-' < /proc/sys/kernel/random/uuid > "$root/etc/machine-id"
-    chmod 444 "$root/etc/machine-id"
+guest=/usr/lib/arlinux/guest
+test -f /usr/share/arlinux/offline-desktop
+test -x /opt/OpenCode/ai.opencode.desktop
+if [ ! -s /etc/machine-id ]; then
+    chmod u+w /etc/machine-id
+    tr -d '-' < /proc/sys/kernel/random/uuid > /etc/machine-id
+    chmod 444 /etc/machine-id
 fi
-
-guest=$root/usr/lib/arlinux/guest
-install -Dm755 "$guest/install-codex.sh" "$root/usr/local/bin/arlinux-install-codex"
-mkdir -p "$root/etc/apt/sources.list.d" "$root/etc/dpkg/dpkg.cfg.d" \
-    "$root/var/lib/apt/lists/partial" "$root/var/cache/apt/archives/partial" "$root/var/log/apt"
-if [ ! -f "$root/etc/apt/sources.list.d/debian.sources" ]; then
-    cp "$guest/debian.sources" "$root/etc/apt/sources.list.d/debian.sources"
-fi
-sed "s|@ROOT@|$root|g" "$guest/apt.conf.in" > "$root/etc/apt/apt.conf"
-printf 'force-confnew\n' > "$root/etc/dpkg/dpkg.cfg.d/arlinux"
-mkdir -p "$root/etc/ld.so.conf.d"
-mkdir -p "$root/etc/fonts/conf.d"
-cp "$guest/50-arlinux-wps-fonts.conf" \
-    "$root/etc/fonts/conf.d/50-arlinux-wps-fonts.conf"
-
-dpkg-divert --local --no-rename --add /usr/bin/sudo
-ldconfig
-
-# dpkg owns interrupted transaction state; no parallel snapshots/manifests.
-if ! dpkg --configure -a; then
-    apt-get update
-    apt-get -f install -y
-fi
-set -- foot curl ca-certificates fonts-dejavu-core fonts-noto-cjk fontconfig \
-    x11-xserver-utils x11-utils dbus-x11 at-spi2-core python3-dbus python3-pyatspi \
-    ibus ibus-gtk3 ibus-gtk4 gir1.2-ibus-1.0 \
-    python3-dogtail python3-pip mpg123 \
-    wl-clipboard wtype xclip xdotool \
-    libwayland-egl1 libwayland-client0 libwayland-server0 libx11-xcb1 \
-    libasound2-plugins
-missing=
-for pkg do
-    if ! dpkg-query -W -f '${Status}' "$pkg" 2>/dev/null | grep -q 'install ok installed'; then
-        missing=1
-        break
-    fi
-done
-if [ -n "$missing" ]; then
-    echo "ARLINUX:Updating Debian package metadata..."
-    apt-get update
-    echo "ARLINUX:Installing Debian desktop components..."
-    apt-get install -y --no-install-recommends "$@"
-    # apt may have replaced libc and the loader beneath this still-running
-    # process. Ask Android for a fresh runtime process before any
-    # newly installed program is launched.
-    exit 75
-fi
-
-# Prefer the Wayland-native terminal without overriding a user's manual choice.
-if update-alternatives --query x-terminal-emulator | grep -q '^Status: auto$'; then
-    update-alternatives --set x-terminal-emulator /usr/bin/foot
-fi
-
-# edge-tts uses Microsoft's online Edge speech service.  Pin the Python client
-# so initial installations remain reproducible; mpg123 plays through PulseAudio
-# without launching a media-player window.
-if ! python3 -c 'import edge_tts' >/dev/null 2>&1; then
-    echo "ARLINUX:Installing online speech support..."
-    python3 -m pip install --break-system-packages --no-cache-dir \
-        --index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple \
-        'edge-tts==7.2.8'
-fi
-mkdir -p "$root/usr/lib/python3/dist-packages"
-mkdir -p "$root/usr/lib/python3/dist-packages/arlinux"
-rm -f "$root/usr/lib/python3/dist-packages/arlinux/_accessibility.py"
-cp "$guest/arlinux/"*.py "$root/usr/lib/python3/dist-packages/arlinux/"
-rm -f "$root/usr/lib/python3/dist-packages/arlinux_tts.py"
-
-"$root/bin/sh" "$guest/opencode-install.sh"
-"$root/bin/sh" "$guest/opencode-instructions.sh"
-
-mkdir -p "$root/etc/pulse/client.conf.d" "$root/etc/alsa/conf.d"
+install -Dm755 "$guest/install-codex.sh" /usr/local/bin/arlinux-install-codex
+mkdir -p /etc/fonts/conf.d /usr/lib/python3/dist-packages/arlinux
+cp "$guest/50-arlinux-wps-fonts.conf" /etc/fonts/conf.d/
+cp "$guest/arlinux/"*.py /usr/lib/python3/dist-packages/arlinux/
+/bin/sh "$guest/opencode-instructions.sh"
+mkdir -p /etc/pulse/client.conf.d /etc/alsa/conf.d
 printf 'default-server = unix:%s/runtime/pulse-native\nautospawn = no\nenable-shm = no\n' \
-    "$BIONICX_FILES" > "$root/etc/pulse/client.conf.d/arlinux.conf"
-# Debian's standard ALSA pulse plugin connects to the Android host service.
-cat > "$root/etc/alsa/conf.d/99-arlinux-pulse.conf" <<'ALSA'
-pcm.!default { type pulse }
-ctl.!default { type pulse }
-ALSA
-
-# Refresh product shortcuts for new installations and APK upgrades.
-"$root/bin/sh" "$root/usr/lib/arlinux/guest/wps-shortcuts.sh"
+    "$BIONICX_FILES" > /etc/pulse/client.conf.d/arlinux.conf
+printf 'pcm.!default { type pulse }\nctl.!default { type pulse }\n' \
+    > /etc/alsa/conf.d/99-arlinux-pulse.conf
+/bin/sh "$guest/wps-shortcuts.sh"
