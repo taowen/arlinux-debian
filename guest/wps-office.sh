@@ -32,4 +32,8 @@ export QT_QPA_PLATFORM_PLUGIN_PATH=$office/qt/plugins/platforms
 export XKB_CONFIG_ROOT=${BIONICX_FILES:-${root%/rootfs}}/xkb
 export QT_XKB_CONFIG_ROOT=$XKB_CONFIG_ROOT
 export FONTCONFIG_PATH=$root/etc/fonts FONTCONFIG_FILE=fonts.conf FONTCONFIG_SYSROOT=$root
+# WPS's RPATH prefers its bundled FreeType, which lacks symbols required by
+# Debian's Fontconfig. Keep both font libraries on the system ABI for every
+# editor; scope this override to WPS, preserving any caller preloads.
+export LD_PRELOAD="$root/usr/lib/aarch64-linux-gnu/libfreetype.so.6${LD_PRELOAD:+:$LD_PRELOAD}"
 exec "$office/$binary" "$@"

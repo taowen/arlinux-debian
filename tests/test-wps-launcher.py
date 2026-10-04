@@ -36,7 +36,7 @@ with tempfile.TemporaryDirectory() as directory:
     office = root / 'opt/kingsoft/wps-office/office6'
     office.mkdir(parents=True)
     program = office / 'wps'
-    program.write_text('#!/bin/sh\n[ "${TEST_INSTALL_ROOT:-0}" = 0 ] || exit 1\nprintf "%s\\n" "$@" > "$HOME/arguments"\n')
+    program.write_text('#!/bin/sh\n[ "${TEST_INSTALL_ROOT:-0}" = 0 ] || exit 1\nprintf "%s\\n" "$@" > "$HOME/arguments"\nprintf "%s\\n" "$LD_PRELOAD" > "$HOME/preload"\n')
     program.chmod(0o755)
     payload = b'test vendor archive\n'
     sha = hashlib.sha256(payload).hexdigest()
@@ -86,6 +86,11 @@ else printf 'test vendor archive\\n' > "$output"; fi
     result = run()
     assert result.returncode == 0, result.stderr or result.stdout
     assert (home / 'arguments').read_text() == 'a b.docx\n--literal\n'
+    system_freetype = shell_path(root / 'usr/lib/aarch64-linux-gnu/libfreetype.so.6')
+    assert run(LD_PRELOAD='').returncode == 0
+    assert (home / 'preload').read_text().strip() == system_freetype
+    assert run(LD_PRELOAD='/test/caller.so').returncode == 0
+    assert (home / 'preload').read_text().strip() == system_freetype + ':/test/caller.so'
     assert run().returncode == 0
     assert len((home / 'downloads').read_text().splitlines()) == 10
     (home / 'installed').unlink()
