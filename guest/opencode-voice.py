@@ -51,14 +51,36 @@ def find_opencode():
     raise RuntimeError("OpenCode window not found")
 
 
+def ensure_opencode() -> None:
+    """Start the normal desktop app when absent and await its accessible UI."""
+    try:
+        find_opencode()
+        running = True
+    except RuntimeError:
+        running = False
+    if not running and sys.argv[1] == "focus":
+        # The host launches the app as an independent desktop process, not a
+        # child of this cancellable, short-lived accessibility request.
+        raise SystemExit(3)
+    deadline = time.monotonic() + 24
+    while time.monotonic() < deadline:
+        try:
+            app = find_opencode()
+            find_named(app, "document web", "OpenCode")
+            return
+        except RuntimeError:
+            time.sleep(0.2)
+    raise RuntimeError("OpenCode did not become ready within 24 seconds")
+
+
 def raise_opencode() -> None:
     windows = subprocess.run(
         ["xdotool", "search", "--onlyvisible", "--name", "^OpenCode$"],
         capture_output=True, text=True,
     ).stdout.split()
-    if not windows:
-        raise RuntimeError("OpenCode window is not ready yet")
-    subprocess.run(["xdotool", "windowactivate", windows[-1]], check=True)
+    if windows:
+        subprocess.run(["xdotool", "windowactivate", windows[-1]], check=True)
+    # Native Wayland windows are focused through the prompt's AT-SPI Component.
 
 
 def find_named(root, role: str, name: str):
@@ -138,8 +160,17 @@ def activate(node, action_name: str) -> bool:
 
 
 def focus_prompt() -> None:
+    ensure_opencode()
     raise_opencode()
-    prompt = open_prompt()
+    deadline = time.monotonic() + 5
+    while True:
+        try:
+            prompt = open_prompt()
+            break
+        except RuntimeError:
+            if time.monotonic() >= deadline:
+                raise
+            time.sleep(0.2)
     try:
         focused = prompt.queryComponent().grabFocus()
     except Exception:
@@ -208,11 +239,11 @@ def send_prompt() -> None:
 
 
 def main() -> int:
-    if len(sys.argv) != 2 or sys.argv[1] not in {"focus", "send"}:
-        print("usage: opencode-voice.py focus|send", file=sys.stderr)
+    if len(sys.argv) != 2 or sys.argv[1] not in {"focus", "focus-wait", "send"}:
+        print("usage: opencode-voice.py focus|focus-wait|send", file=sys.stderr)
         return 2
     select_accessibility_bus()
-    if sys.argv[1] == "focus":
+    if sys.argv[1] in {"focus", "focus-wait"}:
         focus_prompt()
     else:
         send_prompt()
