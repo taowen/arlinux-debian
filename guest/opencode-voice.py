@@ -151,6 +151,11 @@ def text_of(entry) -> str:
     return text.getText(0, text.characterCount)
 
 
+def prompt_content(text: str) -> str:
+    """Ignore accessibility placeholders and empty editor formatting."""
+    return text.replace("\u200b", "").replace("\ufffc", "").strip()
+
+
 def activate(node, action_name: str) -> bool:
     actions = node.queryAction()
     for index in range(actions.nActions):
@@ -201,7 +206,7 @@ def send_prompt() -> None:
         except Exception:
             time.sleep(0.15)
             continue
-        if current.replace("\u200b", "").strip() and current != baseline:
+        if prompt_content(current) and prompt_content(current) != prompt_content(baseline):
             if current != changed:
                 changed = current
                 stable_since = time.monotonic()
@@ -223,7 +228,7 @@ def send_prompt() -> None:
                 while time.monotonic() < submitted:
                     try:
                         prompt = find_named(find_opencode(), "entry", "Prompt")
-                        if text_of(prompt) != current:
+                        if not prompt_content(text_of(prompt)):
                             break
                     except Exception:
                         # Submission can replace the entry while navigating.
