@@ -3,7 +3,7 @@
 set -eu
 guest=/usr/lib/arlinux/guest
 test -f /usr/share/arlinux/offline-desktop
-test -x /opt/OpenCode/ai.opencode.desktop
+test -x /usr/bin/arlinux-opencode
 if [ ! -s /etc/machine-id ]; then
     chmod u+w /etc/machine-id
     tr -d '-' < /proc/sys/kernel/random/uuid > /etc/machine-id

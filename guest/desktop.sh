@@ -1,6 +1,6 @@
 #!/bin/sh
 # Local files remain usable even when the optional AI service is offline.
 set -eu
-/opt/OpenCode/ai.opencode.desktop --force-renderer-accessibility &
+# OpenCode is optional: Apps and the AI voice entry install it on first use.
 # Keep the desktop bus alive when users close every application.
 exec sleep infinity

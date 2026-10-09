@@ -2,10 +2,13 @@
 
 Arlinux Debian is the minimal Debian reference distribution for
 [arlinux-rootfs](https://github.com/taowen/arlinux-rootfs). It boots directly
-into OpenCode Desktop, including all startup packages for offline first boot,
+into an offline desktop with all startup packages included,
 and includes standard Debian package management, Linux
 desktop accessibility, online progress speech, and optional WPS launchers.
-It includes the Wayland-native foot terminal. Codex CLI is optional and is
+The Apps menu includes OpenCode: its first launch downloads and installs the
+pinned official desktop package. The AI voice entry uses the same installer.
+First-time installation requires internet and may take several minutes; later
+launches use the installed app. It includes the Wayland-native foot terminal. Codex CLI is optional and is
 installed by the user inside the running Debian instance, not bundled in the
 rootfs. In foot, run `arlinux-install-codex` and then `codex login`.
 
@@ -27,10 +30,10 @@ for the interface implemented here.
 
 - `rootfs.lock.json` pins the Debian suite and bootstrap inputs.
 - `tools/seed.sh` creates the foreign-architecture rootfs seed.
-- `guest/build-desktop.sh` installs desktop packages, OpenCode and Python dependencies in a disposable Android build instance.
+- `guest/build-desktop.sh` installs desktop packages and Python dependencies in a disposable Android build instance.
 - `guest/first-boot.sh` writes device-local configuration without network access.
 - `guest/install-codex.sh` installs Codex CLI on the device on request.
-- `profile.json` launches OpenCode on the host-provided display.
+- `profile.json` keeps the desktop session on the host-provided display alive.
 - `tests/` covers installer idempotency and generated launchers.
 
 The normal Linux build creates a foreign seed without QEMU or chroot. Use
