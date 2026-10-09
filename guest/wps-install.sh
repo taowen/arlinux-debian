@@ -39,10 +39,16 @@ install_wps() {
         status=$(dpkg-query -W -f '${Status}' "$package" 2>/dev/null || true)
         [ "$status" = 'install ok installed' ] || ready=0
     done
-    if [ "$ready" -eq 0 ]; then
-        echo 'Installing WPS dependencies...'
+    fonts_ready=1
+    for weight in Regular Bold; do
+        [ -s "$root/usr/share/fonts/opentype/noto/NotoSerifCJK-$weight.ttc" ] || fonts_ready=0
+    done
+    if [ "$ready" -eq 0 ] || [ "$fonts_ready" -eq 0 ]; then
         export DEBIAN_FRONTEND=noninteractive
         apt-get update
+    fi
+    if [ "$ready" -eq 0 ]; then
+        echo 'Installing WPS dependencies...'
         apt-get install -y --no-install-recommends curl ca-certificates xdg-utils \
             fonts-liberation fontconfig libxkbcommon-x11-0 libxslt1.1 libglu1-mesa \
             libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 \
@@ -54,6 +60,12 @@ install_wps() {
             set -- "$@" "$download"
         done
         apt-get install -y --no-install-recommends "$@"
+    fi
+    if [ "$fonts_ready" -eq 0 ]; then
+        echo 'Installing Chinese, Japanese and Korean document fonts...'
+        apt-get install -y --no-install-recommends --reinstall fonts-noto-cjk
+    fi
+    if [ "$ready" -eq 0 ] || [ "$fonts_ready" -eq 0 ]; then
         fc-cache -f
     fi
 }

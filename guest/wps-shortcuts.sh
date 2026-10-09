@@ -13,20 +13,26 @@ EOF
     chmod 755 "$target"
     ln -sfn "$target" "$HOME/wps-$component"
     case "$component" in
-        writer) title='WPS Writer'; icon=wps-office-wps ;;
-        spreadsheet) title='WPS Spreadsheets'; icon=wps-office-et ;;
-        presentation) title='WPS Presentation'; icon=wps-office-wpp ;;
-        pdf) title='WPS PDF'; icon=wps-office-pdf ;;
+        writer) title='WPS Writer'; title_zh='WPS 文字'; category=WordProcessor; desktop=wps-office-wps ;;
+        spreadsheet) title='WPS Spreadsheets'; title_zh='WPS 表格'; category=Spreadsheet; desktop=wps-office-et ;;
+        presentation) title='WPS Presentation'; title_zh='WPS 演示'; category=Presentation; desktop=wps-office-wpp ;;
+        pdf) title='WPS PDF'; title_zh='WPS PDF'; category=Viewer; desktop=wps-office-pdf ;;
     esac
-    cat > "$HOME/.local/share/applications/arlinux-wps-$component.desktop" <<EOF
+    # Override the vendor's desktop ID so installation does not create duplicates.
+    cat > "$HOME/.local/share/applications/$desktop.desktop" <<EOF
 [Desktop Entry]
 Type=Application
 Name=$title
+Name[zh_CN]=$title_zh
 Comment=Download and install WPS on first use
+Comment[zh_CN]=首次使用时联网安装 WPS 和中文文档字体
 Exec=$root/usr/bin/foot --title="$title" -- $target %F
-Icon=$icon
+Icon=$guest/icons/wps-$component.png
 Terminal=false
-Categories=Office;
+Categories=Office;$category;
 StartupNotify=false
 EOF
 done
+# The suite's extra home launcher bypasses the prepared component environment.
+printf '[Desktop Entry]\nType=Application\nHidden=true\n' \
+    > "$HOME/.local/share/applications/wps-office-prometheus.desktop"

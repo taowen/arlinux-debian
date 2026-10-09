@@ -68,7 +68,18 @@ else printf 'test vendor archive\\n' > "$output"; fi
     sudo.chmod(0o755)
     for name, source in {
         'dpkg-query': '[ -f "$HOME/installed" ] && printf "install ok installed"',
-        'apt-get': '[ "$TEST_INSTALL_ROOT" = 1 ] || exit 1\nfor arg do case "$arg" in *.deb) touch "$HOME/installed";; esac; done',
+        'apt-get': '''[ "$TEST_INSTALL_ROOT" = 1 ] || exit 1
+printf '%s\\n' "$*" >> "$HOME/apt-calls"
+for arg do
+    case "$arg" in
+        *.deb) touch "$HOME/installed" ;;
+        fonts-noto-cjk)
+            fonts="$BIONICX_ROOTFS/usr/share/fonts/opentype/noto"
+            mkdir -p "$fonts"
+            printf 'font' > "$fonts/NotoSerifCJK-Regular.ttc"
+            printf 'font' > "$fonts/NotoSerifCJK-Bold.ttc" ;;
+    esac
+done''',
         'fc-cache': '[ "$TEST_INSTALL_ROOT" = 1 ]',
     }.items():
         command = commands / name
@@ -86,12 +97,20 @@ else printf 'test vendor archive\\n' > "$output"; fi
     result = run()
     assert result.returncode == 0, result.stderr or result.stdout
     assert (home / 'arguments').read_text() == 'a b.docx\n--literal\n'
+    fonts = root / 'usr/share/fonts/opentype/noto'
+    assert (fonts / 'NotoSerifCJK-Regular.ttc').is_file()
+    assert (fonts / 'NotoSerifCJK-Bold.ttc').is_file()
+    apt_calls = (home / 'apt-calls').read_text()
     system_freetype = shell_path(root / 'usr/lib/aarch64-linux-gnu/libfreetype.so.6')
     assert run(LD_PRELOAD='').returncode == 0
     assert (home / 'preload').read_text().strip() == system_freetype
     assert run(LD_PRELOAD='/test/caller.so').returncode == 0
     assert (home / 'preload').read_text().strip() == system_freetype + ':/test/caller.so'
     assert run().returncode == 0
+    assert (home / 'apt-calls').read_text() == apt_calls, 'installed launch used apt/network'
+    (fonts / 'NotoSerifCJK-Bold.ttc').unlink()
+    assert run().returncode == 0
+    assert (fonts / 'NotoSerifCJK-Bold.ttc').is_file(), 'missing document fonts not repaired'
     assert len((home / 'downloads').read_text().splitlines()) == 10
     (home / 'installed').unlink()
     (home / '.cache/arlinux-wps/libwebp6-1.deb').write_text('corrupted cache')
@@ -102,9 +121,14 @@ else printf 'test vendor archive\\n' > "$output"; fi
     assert result.returncode == 0, result.stderr or result.stdout
     assert (home / 'arguments').read_text() == 'from shortcut.docx\n'
     assert settings.read_text() == 'user settings\n'
-    assert len(list((home / '.local/share/applications').glob('arlinux-wps-*.desktop'))) == 4
-    shortcut = (home / '.local/share/applications/arlinux-wps-writer.desktop').read_text()
+    assert len(list((home / '.local/share/applications').glob('wps-office-*.desktop'))) == 5
+    shortcut = (home / '.local/share/applications/wps-office-wps.desktop').read_text()
     assert '/usr/bin/foot --title="WPS Writer" -- ' in shortcut
     assert '/usr/bin/xterm' not in shortcut
+    for component, desktop in (('writer', 'wps'), ('spreadsheet', 'et'), ('presentation', 'wpp'), ('pdf', 'pdf')):
+        shortcut = (home / f'.local/share/applications/wps-office-{desktop}.desktop').read_text()
+        assert f'Icon={shell_path(guest)}/icons/wps-{component}.png' in shortcut
+        assert (guest / 'icons' / f'wps-{component}.png').is_file()
+    assert 'Hidden=true' in (home / '.local/share/applications/wps-office-prometheus.desktop').read_text()
     assert run(['sh', shell_path(guest / 'wps-office.sh'), 'invalid']).returncode == 2
 print('PASS: checksum failure, retry, cache validation, shortcut and file arguments')

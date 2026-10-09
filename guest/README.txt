@@ -10,8 +10,10 @@ local ARM64 package and its repository dependencies with:
 
   sudo apt install ./package_arm64.deb
 
-Optional WPS launchers download a pinned, checksum-verified package on first
-use:
+The Apps launcher includes WPS Writer, Spreadsheets, Presentation and PDF.
+First use downloads a pinned, checksum-verified WPS package and installs CJK
+document fonts; subsequent launches use the installed applications offline.
+The same shortcuts are available from a terminal:
 
   wps-writer
   wps-spreadsheet
