@@ -4,6 +4,8 @@ set -eu
 guest=/usr/lib/arlinux/guest
 test -f /usr/share/arlinux/offline-desktop
 test -x /usr/bin/arlinux-opencode
+# Package triggers do not run when an offline rootfs is imported.
+update-mime-database /usr/share/mime
 if [ ! -s /etc/machine-id ]; then
     chmod u+w /etc/machine-id
     tr -d '-' < /proc/sys/kernel/random/uuid > /etc/machine-id
