@@ -19,6 +19,7 @@ if ! dpkg --configure -a; then
     apt-get -f install -y
 fi
 apt-get update
+apt-get install -y --no-install-recommends /usr/lib/arlinux/mesa-packages/*.deb libegl1 libgles2 libopengl0
 apt-get install -y --no-install-recommends \
     foot curl ca-certificates fonts-dejavu-core fonts-noto-cjk fontconfig \
     x11-xserver-utils x11-utils dbus-x11 at-spi2-core python3-dbus python3-pyatspi \
@@ -30,6 +31,8 @@ touch /usr/share/arlinux/desktop-packages-installed
 # Restart after apt replaces libc or the loader under the running process.
 exit 75
 fi
+apt-get autoremove -y
+rm -f /usr/lib/arlinux/mesa-packages/*.deb
 python3 -m pip install --break-system-packages --no-cache-dir \
     --index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple 'edge-tts==7.2.8'
 python3 -c 'import edge_tts, pyatspi'
