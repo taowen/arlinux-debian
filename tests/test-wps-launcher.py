@@ -23,6 +23,11 @@ with tempfile.TemporaryDirectory() as directory:
     root = tmp / 'root'
     guest = root / 'usr/lib/arlinux/guest'
     shutil.copytree(product / 'guest', guest)
+    shared_root = tmp / 'shared'
+    shared_root.mkdir()
+    shared_source = (product.parents[1] / 'runtime/tools/shared.py').read_text()
+    (guest.parent / 'shared.py').write_text(shared_source.replace(
+        "ROOT = Path('/arlinux-shared')", f'ROOT = Path({str(shared_root)!r})'))
     home = tmp / 'home'
     home.mkdir()
     settings = home / '.config/Kingsoft/Office.conf'
@@ -93,7 +98,7 @@ done''',
         return subprocess.run(args, env={**env, **overrides}, capture_output=True, text=True)
     assert run(CORRUPT='1').returncode != 0
     assert not (home / 'arguments').exists(), 'corrupt download launched WPS'
-    assert not (home / '.cache/arlinux-wps/vendor-1.deb').exists()
+    assert not (shared_root / 'downloads' / (sha + '.deb')).exists()
     result = run()
     assert result.returncode == 0, result.stderr or result.stdout
     assert (home / 'arguments').read_text() == 'a b.docx\n--literal\n'
@@ -111,11 +116,11 @@ done''',
     (fonts / 'NotoSerifCJK-Bold.ttc').unlink()
     assert run().returncode == 0
     assert (fonts / 'NotoSerifCJK-Bold.ttc').is_file(), 'missing document fonts not repaired'
-    assert len((home / 'downloads').read_text().splitlines()) == 10
+    assert len((home / 'downloads').read_text().splitlines()) == 4
     (home / 'installed').unlink()
-    (home / '.cache/arlinux-wps/libwebp6-1.deb').write_text('corrupted cache')
+    (shared_root / 'downloads' / (sha + '.deb')).write_text('corrupted cache')
     assert run().returncode == 0
-    assert len((home / 'downloads').read_text().splitlines()) == 12
+    assert len((home / 'downloads').read_text().splitlines()) == 6
     assert run(['sh', shell_path(guest / 'wps-shortcuts.sh')]).returncode == 0
     result = run(['sh', shell_path(home / 'wps-writer'), 'from shortcut.docx'])
     assert result.returncode == 0, result.stderr or result.stdout
