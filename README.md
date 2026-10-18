@@ -21,13 +21,13 @@ Builds and releases follow the [canonical build and release guide](https://githu
 
 - `rootfs.lock.json` pins the Debian suite and bootstrap inputs.
 - `tools/seed.sh` creates the foreign-architecture rootfs seed.
-- `guest/build-desktop.sh` installs desktop packages and Python dependencies in a disposable Linux/WSL QEMU chroot.
+- `guest/build-desktop.sh` installs desktop packages and Python dependencies in a disposable Linux chroot on the build runner.
 - `guest/first-boot.sh` writes device-local configuration without network access.
 - `guest/install-codex.sh` installs Codex CLI on the device on request.
 - `profile.json` keeps the desktop session on the host-provided display alive.
 - `tests/` covers installer idempotency and generated launchers.
 
-Package installation runs on the Linux/WSL build host. First boot only writes device-local settings.
+Package installation runs on the Linux build runner. First boot only writes device-local settings.
 Thunar and Mousepad are included for local file and text work. Online AI and
 speech services still require internet; optional applications are not preinstalled.
 
