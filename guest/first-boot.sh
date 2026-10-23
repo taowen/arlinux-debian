@@ -12,10 +12,8 @@ if [ ! -s /etc/machine-id ]; then
     chmod 444 /etc/machine-id
 fi
 install -Dm755 "$guest/install-codex.sh" /usr/local/bin/arlinux-install-codex
-mkdir -p /etc/fonts/conf.d /usr/lib/python3/dist-packages/arlinux
+mkdir -p /etc/fonts/conf.d
 cp "$guest/50-arlinux-wps-fonts.conf" /etc/fonts/conf.d/
-cp "$guest/arlinux/"*.py /usr/lib/python3/dist-packages/arlinux/
-/bin/sh "$guest/opencode-instructions.sh"
 mkdir -p /etc/pulse/client.conf.d /etc/alsa/conf.d
 printf 'default-server = unix:%s/runtime/pulse-native\nautospawn = no\nenable-shm = no\n' \
     "$BIONICX_FILES" > /etc/pulse/client.conf.d/arlinux.conf
