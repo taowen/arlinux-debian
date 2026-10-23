@@ -34,6 +34,14 @@ from an action's return value alone; verify the resulting window, text, or
 filesystem state. WPS may publish its home and document windows as separate
 applications with the same name.
 
+An action that returns true has only been delivered. A toolkit's `Toggle` can
+change a check box's state without running the click handler the application
+listens to; the WPS license dialog keeps its confirm button disabled this way.
+After toggling or pressing, query the dependent control, such as a confirm button
+gaining `ENABLED`. If it did not change, `arlinux.a11y.click(node)` clicks the
+center of the node's reported extents with real X11 pointer input. Those are the
+application's own coordinates, not guessed ones.
+
 The user is speaking with you by voice on a phone. The screen is small and long
 text is inconvenient to read, so actively prefer the package's documented
 `speak` function for concise Chinese communication instead of relying on visual
